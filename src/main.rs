@@ -1,18 +1,33 @@
+mod structs;
+
+use crate::structs::ray::Ray;
+use crate::structs::vec3::Vec3;
+
 use std::fmt::Write;
 use std::fs::File;
 use std::io::{BufWriter, Write as ioWrite};
 use std::path::Path;
 
 fn create_image_bitmap(nx: i32, ny: i32) -> String {
+    let lower_left_corner = Vec3::new(-2.0, -1.0, -1.0);
+    let horizontal = Vec3::new(4.0, 0.0, 0.0);
+    let vertical = Vec3::new(0.0, 2.0, 0.0);
+    let origin = Vec3::new(0.0, 0.0, 0.0);
+
     let mut result = format!("P3\n{} {}\n255\n", nx, ny);
     for j in (0..ny).rev() {
         for i in 0..nx {
-            let r = i as f32 / nx as f32;
-            let g = j as f32 / ny as f32;
-            let b = 0.2 as f32;
-            let ir = (255.99 * r) as i32;
-            let ig = (255.99 * g) as i32;
-            let ib = (255.99 * b) as i32;
+            let u = i as f64 / nx as f64;
+            let v = j as f64 / ny as f64;
+            let r = Ray::new(
+                &origin,
+                &(lower_left_corner + u * horizontal + v * vertical),
+            );
+            let col = Ray::color(&r);
+
+            let ir = (255.99 * col.x_) as i32;
+            let ig = (255.99 * col.y_) as i32;
+            let ib = (255.99 * col.z_) as i32;
             writeln!(result, "{} {} {}", ir, ig, ib);
         }
     }
