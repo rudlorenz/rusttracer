@@ -32,12 +32,12 @@ impl Ray {
         let unit_dir: Vec3 = Vec3::unit_vector(&r.direction());
         let t = 0.5 * (unit_dir.y_ + 1.0);
 
-        (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
+        (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.7, 0.7, 1.0)
     }
 }
 
 impl fmt::Display for Ray {
-    fn fmt(&self, f : &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{} -> {}", self.orig_, self.direction_)
     }
 }

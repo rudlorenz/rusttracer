@@ -1,8 +1,7 @@
 extern crate overload;
 use overload::overload;
-use std::ops;
 use std::fmt;
-
+use std::ops;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vec3 {
@@ -24,12 +23,12 @@ impl Vec3 {
         direction / direction.length()
     }
 
-    pub fn dot(&self, other: &Vec3) -> f64 {
-        self.x_ * other.x_ + self.y_ * other.y_ + self.z_ * other.z_
+    pub fn dot(lhs: &Vec3, rhs: &Vec3) -> f64 {
+        lhs.x_ * rhs.x_ + lhs.y_ * rhs.y_ + lhs.z_ * rhs.z_
     }
 
     pub fn length(&self) -> f64 {
-        (self.dot(self)).sqrt()
+        Vec3::dot(self, self).sqrt()
     }
 }
 
