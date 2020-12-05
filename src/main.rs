@@ -7,8 +7,9 @@ use crate::structs::vec3::Vec3;
 use crate::structs::viewport::Viewport;
 
 extern crate image;
-
 use image::Rgb;
+
+use rand::Rng;
 
 fn ray_col(r: &Ray, world: &HitList) -> Vec3 {
     let tryhit = world.hit(r, 0., f64::MAX);
@@ -25,6 +26,7 @@ fn ray_col(r: &Ray, world: &HitList) -> Vec3 {
 fn main() {
     let nx = 800;
     let ny = 400;
+    let samples = 50;
     let viewport = Viewport::new();
 
     let hit_listy = HitList {
@@ -36,12 +38,19 @@ fn main() {
 
     let mut img_buf = image::ImageBuffer::new(nx, ny);
 
-    for j in (0..ny).rev() {
+    let mut rng = rand::thread_rng();
+
+    for j in 0..ny {
         for i in 0..nx {
-            let u = i as f64 / nx as f64;
-            let v = (ny - j) as f64 / ny as f64;
-            let r = viewport.send_ray(u, v);
-            let col = ray_col(&r, &hit_listy);
+            let mut col = Vec3::new(0., 0., 0.);
+            for _ns in 0..samples {
+                let u = (i as f64 + rng.gen::<f64>()) / nx as f64;
+                let v = ((ny - j) as f64 + rng.gen::<f64>()) / ny as f64;
+                let r = viewport.send_ray(u, v);
+                col = col + ray_col(&r, &hit_listy);
+            }
+
+            col = col / samples as f64;
 
             let ir = (255.99 * col.x_) as u8;
             let ig = (255.99 * col.y_) as u8;
