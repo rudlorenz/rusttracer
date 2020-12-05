@@ -4,6 +4,7 @@ use crate::structs::hitable::*;
 use crate::structs::ray::Ray;
 use crate::structs::sphere::Sphere;
 use crate::structs::vec3::Vec3;
+use crate::structs::viewport::Viewport;
 
 extern crate image;
 
@@ -24,11 +25,7 @@ fn ray_col(r: &Ray, world: &HitList) -> Vec3 {
 fn main() {
     let nx = 800;
     let ny = 400;
-
-    let lower_left_corner = Vec3::new(-2.0, -1.0, -1.0);
-    let horizontal = Vec3::new(4.0, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, 2.0, 0.0);
-    let origin = Vec3::new(0.0, 0.0, 0.0);
+    let viewport = Viewport::new();
 
     let hit_listy = HitList {
         elements_: vec![
@@ -43,10 +40,7 @@ fn main() {
         for i in 0..nx {
             let u = i as f64 / nx as f64;
             let v = (ny - j) as f64 / ny as f64;
-            let r = Ray::new(
-                &origin,
-                &(lower_left_corner + u * horizontal + v * vertical),
-            );
+            let r = viewport.send_ray(u, v);
             let col = ray_col(&r, &hit_listy);
 
             let ir = (255.99 * col.x_) as u8;
