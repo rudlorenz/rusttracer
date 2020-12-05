@@ -1,38 +1,23 @@
 mod structs;
 
+use crate::structs::hitable::*;
 use crate::structs::ray::Ray;
+use crate::structs::sphere::Sphere;
 use crate::structs::vec3::Vec3;
 
 extern crate image;
 
 use image::Rgb;
 
-fn hit_sphere(center: &Vec3, radius: f64, r: &Ray) -> f64 {
-    let oc = r.origin() - center;
-    let a = Vec3::dot(&r.direction(), &r.direction());
-    let b = 2.0 * Vec3::dot(&oc, &r.direction());
-    let c = Vec3::dot(&oc, &oc) - radius * radius;
+fn ray_col(r: &Ray, world: &HitList) -> Vec3 {
+    let tryhit = world.hit(r, 0., f64::MAX);
 
-    let discr = b * b - 4. * a * c;
-
-    if discr >= 0. {
-        (-b - discr.sqrt()) / (2. * a)
-    } else {
-        -1.
-    }
-}
-
-fn ray_col(r: &Ray) -> Vec3 {
-    let t = hit_sphere(&Vec3::new(0., 0., -1.), 0.5, r);
-    if t > 0. {
-        let normal = Vec3::unit_vector(&(r.point_at(t) - Vec3::new(0., 0., -1.)));
-        0.5 * Vec3::new(normal.x_ + 1., normal.y_ + 1., normal.z_ + 1.)
-    }
-    else {
-        let unit_direction = Vec3::unit_vector(&r.direction());
-        let t = 0.5 * (unit_direction.y_ + 1.);
-
-        (1. - t) * Vec3::new(1., 1., 1.) + t * Vec3::new(0.5, 0.7, 1.0)
+    match tryhit {
+        Some(hit_rec) => 0.5 * (hit_rec.normal_ + 1.),
+        None => {
+            let t = 0.5 * (Vec3::unit_vector(&r.direction()).y_ + 1.);
+            (1. - t) * Vec3::new(1., 1., 1.) + t * Vec3::new(0.5, 0.7, 1.0)
+        }
     }
 }
 
@@ -45,6 +30,13 @@ fn main() {
     let vertical = Vec3::new(0.0, 2.0, 0.0);
     let origin = Vec3::new(0.0, 0.0, 0.0);
 
+    let hit_listy = HitList {
+        elements_: vec![
+            Box::new(Sphere::new(0.5, &Vec3::new(0., 0., -1.))),
+            Box::new(Sphere::new(100., &Vec3::new(0., -100.5, -1.))),
+        ],
+    };
+
     let mut img_buf = image::ImageBuffer::new(nx, ny);
 
     for j in (0..ny).rev() {
@@ -55,7 +47,7 @@ fn main() {
                 &origin,
                 &(lower_left_corner + u * horizontal + v * vertical),
             );
-            let col = ray_col(&r);
+            let col = ray_col(&r, &hit_listy);
 
             let ir = (255.99 * col.x_) as u8;
             let ig = (255.99 * col.y_) as u8;
