@@ -1,17 +1,20 @@
 use crate::structs::hitable::{HitRecord, Hitable};
+use crate::structs::material::Material;
 use crate::structs::ray::Ray;
 use crate::structs::vec3::Vec3;
 
 pub struct Sphere {
     radius_: f64,
     center_: Vec3,
+    material_: Box<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(radius: f64, center: &Vec3) -> Sphere {
+    pub fn new(radius: f64, center: &Vec3, material: Box<dyn Material>) -> Sphere {
         Sphere {
             radius_: radius,
             center_: *center,
+            material_: material,
         }
     }
 }
@@ -30,6 +33,7 @@ impl Hitable for Sphere {
                     root,
                     &r.point_at(root),
                     &((r.point_at(root) - self.center_) / self.radius_),
+                    self.material_.clone(),
                 ));
             }
             let root = (-b + discr.sqrt()) / a;
@@ -38,6 +42,7 @@ impl Hitable for Sphere {
                     root,
                     &r.point_at(root),
                     &((r.point_at(root) - self.center_) / self.radius_),
+                    self.material_.clone(),
                 ));
             }
         }

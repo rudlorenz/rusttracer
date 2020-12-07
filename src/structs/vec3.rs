@@ -85,3 +85,11 @@ overload!((lhs: ?Vec3) + (rhs: f64) -> Vec3 {
         z_: lhs.z_ + rhs,
     }
 });
+
+overload!((lhs: ?Vec3) - (rhs: f64) -> Vec3 {
+    Vec3 {
+        x_: lhs.x_ - rhs,
+        y_: lhs.y_ - rhs,
+        z_: lhs.z_ - rhs,
+    }
+});
