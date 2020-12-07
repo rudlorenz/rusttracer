@@ -22,7 +22,7 @@ impl HitRecord {
 }
 
 pub struct HitList {
-    pub elements_: Vec<Box<dyn Hitable>>,
+    pub elements_: Vec<Box<dyn Hitable + Send + Sync>>,
 }
 
 impl Hitable for HitList {
