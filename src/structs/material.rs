@@ -51,6 +51,7 @@ impl Material for Lambertian {
 #[derive(Clone)]
 pub struct Metal {
     pub albedo_: Vec3,
+    pub fuzz_: f64,
 }
 
 impl Material for Metal {
@@ -58,7 +59,10 @@ impl Material for Metal {
         let reflect = |v: &Vec3, norm: &Vec3| -> Vec3 { v - 2. * Vec3::dot(v, norm) * norm };
 
         let reflection = reflect(&Vec3::unit_vector(&r.direction()), &hit_record.normal_);
-        let scatter = Ray::new(&hit_record.p_, &reflection);
+        let scatter = Ray::new(
+            &hit_record.p_,
+            &(reflection + self.fuzz_ * random_unit_in_sphere(&mut rand::thread_rng())),
+        );
         if Vec3::dot(&scatter.direction(), &hit_record.normal_) > 0. {
             Some(scatter)
         } else {

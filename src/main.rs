@@ -20,7 +20,7 @@ fn random_unit_in_sphere<R: Rng>(rng: &mut R) -> Vec3 {
             - Vec3::new(1., 1., 1.);
 
         if Vec3::dot(&p, &p) < 1. {
-            break p
+            break p;
         }
     }
 }
@@ -61,8 +61,9 @@ fn main() {
             Box::new(Sphere::new(
                 100.,
                 &Vec3::new(0., -100.5, -1.),
-                Box::new(Lambertian {
-                    albedo_: Vec3::new(0.8, 0.8, 0.),
+                Box::new(Metal {
+                    albedo_: Vec3::new(0.4, 0.4, 0.4),
+                    fuzz_: 0.7,
                 }),
             )),
             Box::new(Sphere::new(
@@ -70,13 +71,15 @@ fn main() {
                 &Vec3::new(1., 0., -1.),
                 Box::new(Metal {
                     albedo_: Vec3::new(0.5, 0.8, 0.2),
+                    fuzz_: 0.5,
                 }),
             )),
             Box::new(Sphere::new(
                 0.5,
                 &Vec3::new(-1., 0., -1.),
                 Box::new(Metal {
-                    albedo_: Vec3::new(0.2, 0.2, 0.8),
+                    albedo_: Vec3::new(0.2, 0.2, 0.6),
+                    fuzz_: 0.,
                 }),
             )),
         ],
