@@ -60,7 +60,8 @@ fn main() {
             Box::new(Sphere::new(
                 0.5,
                 &Point3::new(-1., 0., -1.),
-                Material::new_metal(&Vec3::new(0.2, 0.2, 0.6), 0.),
+                //Material::new_metal(&Vec3::new(0.2, 0.2, 0.6), 0.),
+                Material::new_dielectric(1.5),
             )),
         ],
     };
