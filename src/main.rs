@@ -56,33 +56,22 @@ fn main() {
             Box::new(Sphere::new(
                 0.5,
                 &Point3::new(0., 0., -1.),
-                Box::new(Lambertian {
-                    albedo_: Vec3::new(0.8, 0.3, 0.3),
-                }),
+                Material::new_lambertian(&Vec3::new(0.8, 0.3, 0.3)),
             )),
             Box::new(Sphere::new(
                 100.,
                 &Vec3::new(0., -100.5, -1.),
-                Box::new(Metal {
-                    albedo_: Vec3::new(0.4, 0.4, 0.4),
-                    fuzz_: 0.7,
-                }),
+                Material::new_metal(&Vec3::new(0.4, 0.4, 0.4), 0.7),
             )),
             Box::new(Sphere::new(
                 0.5,
                 &Point3::new(1., 0., -1.),
-                Box::new(Metal {
-                    albedo_: Vec3::new(0.5, 0.8, 0.2),
-                    fuzz_: 0.5,
-                }),
+                Material::new_metal(&Vec3::new(0.5, 0.8, 0.2), 0.5),
             )),
             Box::new(Sphere::new(
                 0.5,
                 &Point3::new(-1., 0., -1.),
-                Box::new(Metal {
-                    albedo_: Vec3::new(0.2, 0.2, 0.6),
-                    fuzz_: 0.,
-                }),
+                Material::new_metal(&Vec3::new(0.2, 0.2, 0.6), 0.),
             )),
         ],
     };

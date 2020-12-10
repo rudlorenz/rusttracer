@@ -3,38 +3,45 @@ use crate::structs::hitable::HitRecord;
 use crate::structs::ray::Ray;
 use crate::structs::vec3::Vec3;
 
-pub trait Material: MaterialClone + Send + Sync {
-    fn scatter(&self, r: &Ray, hit_record: &HitRecord) -> Option<Ray>;
-    fn attenuation(&self) -> Vec3;
+#[derive(Clone, Copy)]
+pub enum Material {
+    Lambertian(Lambertian),
+    Metal(Metal),
 }
 
-// looks hacky as hell
-pub trait MaterialClone {
-    fn clone_box(&self) -> Box<dyn Material>;
-}
+impl Material {
+    pub fn new_lambertian(albedo: &Vec3) -> Self {
+        Material::Lambertian(Lambertian { albedo_: *albedo })
+    }
 
-// kinda smells too
-impl<T> MaterialClone for T
-where
-    T: 'static + Material + Clone,
-{
-    fn clone_box(&self) -> Box<dyn Material> {
-        Box::new(self.clone())
+    pub fn new_metal(albedo: &Vec3, fuzz: f64) -> Self {
+        Material::Metal(Metal {
+            albedo_: *albedo,
+            fuzz_: fuzz,
+        })
+    }
+
+    pub fn scatter(&self, r: &Ray, hit_record: &HitRecord) -> Option<Ray> {
+        match self {
+            Material::Lambertian(lamb) => lamb.scatter(r, hit_record),
+            Material::Metal(met) => met.scatter(r, hit_record),
+        }
+    }
+
+    pub fn attenuation(&self) -> Vec3 {
+        match self {
+            Material::Lambertian(lamb) => lamb.attenuation(),
+            Material::Metal(met) => met.attenuation(),
+        }
     }
 }
 
-impl Clone for Box<dyn Material> {
-    fn clone(&self) -> Box<dyn Material> {
-        self.clone_box()
-    }
-}
-
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Lambertian {
     pub albedo_: Vec3,
 }
 
-impl Material for Lambertian {
+impl Lambertian {
     fn scatter(&self, _r: &Ray, hit_record: &HitRecord) -> Option<Ray> {
         let target =
             hit_record.p_ + hit_record.normal_ + random_unit_in_sphere(&mut rand::thread_rng());
@@ -48,13 +55,13 @@ impl Material for Lambertian {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Metal {
     pub albedo_: Vec3,
     pub fuzz_: f64,
 }
 
-impl Material for Metal {
+impl Metal {
     fn scatter(&self, r: &Ray, hit_record: &HitRecord) -> Option<Ray> {
         let reflect = |v: &Vec3, norm: &Vec3| -> Vec3 { v - 2. * Vec3::dot(v, norm) * norm };
 

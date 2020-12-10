@@ -6,11 +6,11 @@ use crate::structs::vec3::{Point3, Vec3};
 pub struct Sphere {
     radius_: f64,
     center_: Point3,
-    material_: Box<dyn Material>,
+    material_: Material,
 }
 
 impl Sphere {
-    pub fn new(radius: f64, center: &Point3, material: Box<dyn Material>) -> Sphere {
+    pub fn new(radius: f64, center: &Point3, material: Material) -> Sphere {
         Sphere {
             radius_: radius,
             center_: *center,
@@ -33,7 +33,8 @@ impl Hitable for Sphere {
                     root,
                     &r.point_at(root),
                     &((r.point_at(root) - self.center_) / self.radius_),
-                    self.material_.clone(),
+                    &r.direction(),
+                    self.material_,
                 ));
             }
             let root = (-b + discr.sqrt()) / a;
@@ -42,7 +43,8 @@ impl Hitable for Sphere {
                     root,
                     &r.point_at(root),
                     &((r.point_at(root) - self.center_) / self.radius_),
-                    self.material_.clone(),
+                    &r.direction(),
+                    self.material_,
                 ));
             }
         }

@@ -7,18 +7,28 @@ pub trait Hitable {
 }
 
 pub struct HitRecord {
+    pub front_face_: bool,
     pub t_: f64,
     pub p_: Point3,
     pub normal_: Vec3,
-    pub material_: Box<dyn Material>,
+    pub material_: Material,
 }
 
 impl HitRecord {
-    pub fn new(t: f64, p: &Point3, normal: &Vec3, material: Box<dyn Material>) -> HitRecord {
+    pub fn new(
+        t: f64,
+        p: &Point3,
+        normal: &Vec3,
+        ray_direction: &Vec3,
+        material: Material,
+    ) -> HitRecord {
+        let front_face = Vec3::dot(ray_direction, normal) < 0.;
+        let out_normal = if front_face { *normal } else { -normal };
         HitRecord {
+            front_face_: front_face,
             t_: t,
             p_: *p,
-            normal_: *normal,
+            normal_: out_normal,
             material_: material,
         }
     }
