@@ -12,24 +12,13 @@ use rayon::prelude::*;
 extern crate image;
 use image::{ImageBuffer, Rgb};
 
-use rand::Rng;
-
-fn random_unit_in_sphere<R: Rng>(rng: &mut R) -> Vec3 {
-    loop {
-        let p = 2. * Vec3::new(rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>())
-            - Vec3::new(1., 1., 1.);
-
-        if Vec3::dot(&p, &p) < 1. {
-            break p;
-        }
-    }
-}
+use rand::prelude::*;
 
 fn ray_col<R: Rng>(r: &Ray, world: &HitList, rng: &mut R, depth: u32) -> Vec3 {
     match world.hit(r, 0.001, f64::MAX) {
         Some(hit_rec) => {
             if depth < 50 {
-                if let Some(scatter_vec) = hit_rec.material_.scatter(&r, &hit_rec) {
+                if let Some(scatter_vec) = hit_rec.material_.scatter(&r, &hit_rec, rng) {
                     hit_rec.material_.attenuation() * ray_col(&scatter_vec, &world, rng, depth + 1)
                 } else {
                     Vec3::new(0., 0., 0.)
@@ -79,7 +68,7 @@ fn main() {
     let raw_pixels: Vec<u8> = (0..ny)
         .into_par_iter()
         .rev()
-        .map_init(rand::thread_rng, |mut rng, j| {
+        .map_init(rand::thread_rng, |rng, j| {
             let mut rslt = Vec::with_capacity(3 * nx as usize);
             for i in 0..nx {
                 let mut col = Vec3::new(0., 0., 0.);
@@ -87,14 +76,14 @@ fn main() {
                     let u = (i as f64 + rng.gen::<f64>()) / nx as f64;
                     let v = (j as f64 + rng.gen::<f64>()) / ny as f64;
                     let r = viewport.send_ray(u, v);
-                    col = col + ray_col(&r, &hit_listy, &mut rng, 0);
+                    col = col + ray_col(&r, &hit_listy, rng, 0);
                 }
 
                 col = col / samples as f64;
 
-                let ir = (255.99 * col.x_.sqrt()) as u8;
-                let ig = (255.99 * col.y_.sqrt()) as u8;
-                let ib = (255.99 * col.z_.sqrt()) as u8;
+                let ir = (256. * num::clamp(col.x_.sqrt(), 0., 0.999)) as u8;
+                let ig = (256. * num::clamp(col.y_.sqrt(), 0., 0.999)) as u8;
+                let ib = (256. * num::clamp(col.z_.sqrt(), 0., 0.999)) as u8;
 
                 rslt.push(ir);
                 rslt.push(ig);

@@ -1,7 +1,8 @@
-use crate::random_unit_in_sphere;
 use crate::structs::hitable::HitRecord;
 use crate::structs::ray::Ray;
 use crate::structs::vec3::Vec3;
+
+use rand::Rng;
 
 #[derive(Clone, Copy)]
 pub enum Material {
@@ -21,10 +22,10 @@ impl Material {
         })
     }
 
-    pub fn scatter(&self, r: &Ray, hit_record: &HitRecord) -> Option<Ray> {
+    pub fn scatter<R: Rng>(&self, r: &Ray, hit_record: &HitRecord, rng: &mut R) -> Option<Ray> {
         match self {
-            Material::Lambertian(lamb) => lamb.scatter(r, hit_record),
-            Material::Metal(met) => met.scatter(r, hit_record),
+            Material::Lambertian(lamb) => lamb.scatter(r, hit_record, rng),
+            Material::Metal(met) => met.scatter(r, hit_record, rng),
         }
     }
 
@@ -42,11 +43,10 @@ pub struct Lambertian {
 }
 
 impl Lambertian {
-    fn scatter(&self, _r: &Ray, hit_record: &HitRecord) -> Option<Ray> {
-        let target =
-            hit_record.p_ + hit_record.normal_ + random_unit_in_sphere(&mut rand::thread_rng());
+    fn scatter<R: Rng>(&self, _r: &Ray, hit_record: &HitRecord, rng: &mut R) -> Option<Ray> {
+        let scatter_dir = hit_record.normal_ + Vec3::random_in_hemisphere(&hit_record.normal_, rng);
 
-        Some(Ray::new(&hit_record.p_, &(target - hit_record.p_)))
+        Some(Ray::new(&hit_record.p_, &scatter_dir))
     }
 
     fn attenuation(&self) -> Vec3 {
@@ -62,13 +62,13 @@ pub struct Metal {
 }
 
 impl Metal {
-    fn scatter(&self, r: &Ray, hit_record: &HitRecord) -> Option<Ray> {
+    fn scatter<R: Rng>(&self, r: &Ray, hit_record: &HitRecord, rng: &mut R) -> Option<Ray> {
         let reflect = |v: &Vec3, norm: &Vec3| -> Vec3 { v - 2. * Vec3::dot(v, norm) * norm };
 
         let reflection = reflect(&Vec3::unit_vector(&r.direction()), &hit_record.normal_);
         let scatter = Ray::new(
             &hit_record.p_,
-            &(reflection + self.fuzz_ * random_unit_in_sphere(&mut rand::thread_rng())),
+            &(reflection + self.fuzz_ * Vec3::random_in_unit_sphere(rng)),
         );
         if Vec3::dot(&scatter.direction(), &hit_record.normal_) > 0. {
             Some(scatter)

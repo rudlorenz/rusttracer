@@ -3,6 +3,9 @@ use overload::overload;
 use std::fmt;
 use std::ops;
 
+use rand::distributions::Uniform;
+use rand::prelude::*;
+
 #[derive(Debug, Copy, Clone)]
 pub struct Vec3 {
     pub x_: f64,
@@ -26,6 +29,34 @@ impl Vec3 {
             x_: 0.0,
             y_: 0.0,
             z_: 0.0,
+        }
+    }
+
+    pub fn random_in_unit_sphere<R: Rng>(rng: &mut R) -> Vec3 {
+        let rng_range = Uniform::new_inclusive(-1f64, 1f64);
+        loop {
+            let p = Vec3::new(
+                rng_range.sample(rng),
+                rng_range.sample(rng),
+                rng_range.sample(rng),
+            );
+
+            if Vec3::dot(&p, &p) < 1. {
+                break p;
+            }
+        }
+    }
+
+    pub fn random_unit<R: Rng>(rng: &mut R) -> Vec3 {
+        Vec3::unit_vector(&Vec3::random_in_unit_sphere(rng))
+    }
+
+    pub fn random_in_hemisphere<R: Rng>(normal: &Vec3, rng: &mut R) -> Vec3 {
+        let inside = Vec3::random_in_unit_sphere(rng);
+        if Vec3::dot(&inside, &normal) > 0. {
+            inside
+        } else {
+            -inside
         }
     }
 

@@ -11,7 +11,7 @@ pub struct Viewport {
 impl Viewport {
     pub fn new() -> Viewport {
         let aspect_ratio = 16. / 9.;
-        let v_height = 2.;
+        let v_height = 2.5;
         let v_width = v_height * aspect_ratio;
         let focal_len = 1.;
         Viewport {
