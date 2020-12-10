@@ -1,6 +1,6 @@
 use crate::structs::material::Material;
 use crate::structs::ray::Ray;
-use crate::structs::vec3::Vec3;
+use crate::structs::vec3::{Point3, Vec3};
 
 pub trait Hitable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
@@ -8,13 +8,13 @@ pub trait Hitable {
 
 pub struct HitRecord {
     pub t_: f64,
-    pub p_: Vec3,
+    pub p_: Point3,
     pub normal_: Vec3,
     pub material_: Box<dyn Material>,
 }
 
 impl HitRecord {
-    pub fn new(t: f64, p: &Vec3, normal: &Vec3, material: Box<dyn Material>) -> HitRecord {
+    pub fn new(t: f64, p: &Point3, normal: &Vec3, material: Box<dyn Material>) -> HitRecord {
         HitRecord {
             t_: t,
             p_: *p,

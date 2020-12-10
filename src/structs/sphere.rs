@@ -1,16 +1,16 @@
 use crate::structs::hitable::{HitRecord, Hitable};
 use crate::structs::material::Material;
 use crate::structs::ray::Ray;
-use crate::structs::vec3::Vec3;
+use crate::structs::vec3::{Point3, Vec3};
 
 pub struct Sphere {
     radius_: f64,
-    center_: Vec3,
+    center_: Point3,
     material_: Box<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(radius: f64, center: &Vec3, material: Box<dyn Material>) -> Sphere {
+    pub fn new(radius: f64, center: &Point3, material: Box<dyn Material>) -> Sphere {
         Sphere {
             radius_: radius,
             center_: *center,

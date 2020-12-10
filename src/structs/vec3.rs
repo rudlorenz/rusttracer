@@ -10,12 +10,22 @@ pub struct Vec3 {
     pub z_: f64,
 }
 
+pub type Point3 = Vec3;
+
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
         Vec3 {
             x_: x,
             y_: y,
             z_: z,
+        }
+    }
+
+    pub fn zero() -> Vec3 {
+        Vec3 {
+            x_: 0.0,
+            y_: 0.0,
+            z_: 0.0,
         }
     }
 
