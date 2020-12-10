@@ -46,8 +46,8 @@ fn ray_col<R: Rng>(r: &Ray, world: &HitList, rng: &mut R, depth: u32) -> Vec3 {
 }
 
 fn main() {
-    let nx = 800u32;
-    let ny = 400u32;
+    let nx = 1280u32;
+    let ny = 720u32;
     let samples = 50;
     let viewport = Viewport::new();
 
