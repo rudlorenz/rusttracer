@@ -60,12 +60,30 @@ impl Vec3 {
         }
     }
 
+    pub fn random_in_unit_disk<R: Rng>(rng: &mut R) -> Vec3 {
+        let rng_range = Uniform::new_inclusive(-1f64, 1f64);
+        loop {
+            let p = Vec3::new(rng_range.sample(rng), rng_range.sample(rng), 0.);
+            if Vec3::dot(&p, &p) < 1. {
+                break p;
+            }
+        }
+    }
+
     pub fn unit_vector(direction: &Vec3) -> Vec3 {
         direction / direction.length()
     }
 
     pub fn dot(lhs: &Vec3, rhs: &Vec3) -> f64 {
         lhs.x_ * rhs.x_ + lhs.y_ * rhs.y_ + lhs.z_ * rhs.z_
+    }
+
+    pub fn cross(a: &Vec3, b: &Vec3) -> Vec3 {
+        Vec3 {
+            x_: a.y_ * b.z_ - a.z_ * b.y_,
+            y_: a.z_ * b.x_ - a.x_ * b.z_,
+            z_: a.x_ * b.y_ - a.y_ * b.x_,
+        }
     }
 
     pub fn length(&self) -> f64 {
