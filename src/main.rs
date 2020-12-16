@@ -1,10 +1,8 @@
 mod structs;
 
 use crate::structs::hitable::*;
-use crate::structs::material::*;
 use crate::structs::ray::Ray;
-use crate::structs::sphere::Sphere;
-use crate::structs::vec3::{Point3, Vec3};
+use crate::structs::vec3::Vec3;
 use crate::structs::viewport::Viewport;
 
 use rayon::prelude::*;
@@ -29,8 +27,7 @@ fn ray_col<R: Rng>(r: &Ray, world: &HitList, rng: &mut R, depth: u32) -> Vec3 {
                 (1. - t) * Vec3::new(1., 1., 1.) + t * Vec3::new(0.5, 0.7, 1.0)
             }
         }
-    }
-    else {
+    } else {
         Vec3::new(0., 0., 0.)
     }
 }
@@ -39,15 +36,16 @@ fn main() {
     let aspect_ratio = 16. / 9.;
     let img_width = 1200u32;
     let img_height = (img_width as f64 / aspect_ratio) as u32;
-    let samples = 100;
+    let samples = 200;
     let ray_depth = 50;
 
-    let lookfrom = Vec3::new(1., 1., 2.);
-    let lookat = Vec3::new(0., 0., -1.);
+    let lookfrom = Vec3::new(13., 3., 3.);
+    let lookat = Vec3::new(0., 0., 0.);
     let vup = Vec3::new(0., 1., 0.);
     let dist_to_focus = (lookfrom - lookat).length();
+    //let dist_to_focus =  10.;
     let aperture = 0.2;
-    let vertical_fov = 60.;
+    let vertical_fov = 40.;
 
     let viewport = Viewport::new(
         lookfrom,
@@ -56,33 +54,10 @@ fn main() {
         vertical_fov,
         aspect_ratio,
         aperture,
-        dist_to_focus
+        dist_to_focus,
     );
 
-    let hit_listy = HitList {
-        elements_: vec![
-            Box::new(Sphere::new(
-                0.49,
-                &Point3::new(0., 0., -1.),
-                Material::new_lambertian(&Vec3::new(0.8, 0.3, 0.3)),
-            )),
-            Box::new(Sphere::new(
-                0.49,
-                &Point3::new(1., 0., -1.),
-                Material::new_metal(&Vec3::new(0.5, 0.8, 0.2), 0.5),
-            )),
-            Box::new(Sphere::new(
-                0.49,
-                &Point3::new(-1., 0., -1.),
-                Material::new_dielectric(1.5),
-            )),
-            Box::new(Sphere::new(
-                100.,
-                &Vec3::new(0., -100.5, -1.),
-                Material::new_metal(&Vec3::new(0.4, 0.4, 0.4), 0.7),
-            )),
-        ],
-    };
+    let hit_listy = HitList::random_scene();
 
     let raw_pixels: Vec<u8> = (0..img_height)
         .into_par_iter()
