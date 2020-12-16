@@ -1,5 +1,11 @@
 # Rust-Tracer
 
 Implementing basic path-tracer following 
-[Peter Shirley "Ray Tracing in One Weekend"](http://www.realtimerendering.com/raytracing/Ray%20Tracing%20in%20a%20Weekend.pdf) 
+[Peter Shirley "Ray Tracing in One Weekend"](https://raytracing.github.io/books/RayTracingInOneWeekend.html) 
 book.
+
+Also check out <https://raytracing.github.io/>
+
+## Results
+
+![random_scene](result_random_scene.png)
