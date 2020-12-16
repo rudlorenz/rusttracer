@@ -48,7 +48,7 @@ impl Vec3 {
     }
 
     pub fn random_unit<R: Rng>(rng: &mut R) -> Vec3 {
-        Vec3::unit_vector(&Vec3::random_in_unit_sphere(rng))
+        Vec3::unit_vector(Vec3::random_in_unit_sphere(rng))
     }
 
     pub fn random_in_hemisphere<R: Rng>(normal: &Vec3, rng: &mut R) -> Vec3 {
@@ -70,7 +70,7 @@ impl Vec3 {
         }
     }
 
-    pub fn unit_vector(direction: &Vec3) -> Vec3 {
+    pub fn unit_vector(direction: Vec3) -> Vec3 {
         direction / direction.length()
     }
 

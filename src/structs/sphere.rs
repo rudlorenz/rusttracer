@@ -4,47 +4,47 @@ use crate::structs::ray::Ray;
 use crate::structs::vec3::{Point3, Vec3};
 
 pub struct Sphere {
-    radius_: f64,
-    center_: Point3,
-    material_: Material,
+    radius: f64,
+    center: Point3,
+    material: Material,
 }
 
 impl Sphere {
-    pub fn new(radius: f64, center: &Point3, material: Material) -> Sphere {
+    pub fn new(radius: f64, center: Point3, material: Material) -> Sphere {
         Sphere {
-            radius_: radius,
-            center_: *center,
-            material_: material,
+            radius,
+            center,
+            material,
         }
     }
 }
 
 impl Hitable for Sphere {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        let oc = r.origin() - self.center_;
+        let oc = r.origin() - self.center;
         let a = Vec3::dot(&r.direction(), &r.direction());
         let b = Vec3::dot(&oc, &r.direction());
-        let c = Vec3::dot(&oc, &oc) - self.radius_ * self.radius_;
+        let c = Vec3::dot(&oc, &oc) - self.radius * self.radius;
         let discr = b * b - a * c;
         if discr > 0. {
             let root = (-b - discr.sqrt()) / a;
             if root > t_min && root < t_max {
                 return Some(HitRecord::new(
                     root,
-                    &r.point_at(root),
-                    &((r.point_at(root) - self.center_) / self.radius_),
-                    &r.direction(),
-                    self.material_,
+                    r.point_at(root),
+                    (r.point_at(root) - self.center) / self.radius,
+                    r.direction(),
+                    self.material,
                 ));
             }
             let root = (-b + discr.sqrt()) / a;
             if root > t_min && root < t_max {
                 return Some(HitRecord::new(
                     root,
-                    &r.point_at(root),
-                    &((r.point_at(root) - self.center_) / self.radius_),
-                    &r.direction(),
-                    self.material_,
+                    r.point_at(root),
+                    (r.point_at(root) - self.center) / self.radius,
+                    r.direction(),
+                    self.material,
                 ));
             }
         }

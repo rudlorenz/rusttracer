@@ -31,8 +31,8 @@ impl Viewport {
         let view_height = h;
         let view_width = aspect_ratio * view_height;
 
-        let w = Vec3::unit_vector(&(lookfrom - lookat));
-        let u = Vec3::unit_vector(&Vec3::cross(&vup, &w));
+        let w = Vec3::unit_vector(lookfrom - lookat);
+        let u = Vec3::unit_vector(Vec3::cross(&vup, &w));
         let v = Vec3::cross(&w, &u);
 
         Viewport {
@@ -54,10 +54,10 @@ impl Viewport {
         let offset = rd.x_ * self.u_ + rd.y_ * self.v_;
 
         Ray::new(
-            &(self.origin_ + offset),
-            &(self.lower_left_corner_ + s * self.horizontal_ + t * self.vertical_
+            self.origin_ + offset,
+            self.lower_left_corner_ + s * self.horizontal_ + t * self.vertical_
                 - self.origin_
-                - offset),
+                - offset,
         )
     }
 
@@ -65,15 +65,15 @@ impl Viewport {
         if depth != 0 {
             match scene.hit(r, 0.001, f64::MAX) {
                 Some(hit_rec) => {
-                    if let Some(scatter_vec) = hit_rec.material_.scatter(&r, &hit_rec, rng) {
-                        hit_rec.material_.attenuation()
+                    if let Some(scatter_vec) = hit_rec.material.scatter(&r, &hit_rec, rng) {
+                        hit_rec.material.attenuation()
                             * Viewport::ray_col(&scatter_vec, &scene, rng, depth - 1)
                     } else {
                         Vec3::new(0., 0., 0.)
                     }
                 }
                 None => {
-                    let t = 0.5 * (Vec3::unit_vector(&r.direction()).y_ + 1.);
+                    let t = 0.5 * (Vec3::unit_vector(r.direction()).y_ + 1.);
                     (1. - t) * Vec3::new(1., 1., 1.) + t * Vec3::new(0.5, 0.7, 1.0)
                 }
             }

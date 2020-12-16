@@ -12,21 +12,16 @@ pub enum Material {
 }
 
 impl Material {
-    pub fn new_lambertian(albedo: &Vec3) -> Self {
-        Material::Lambertian(Lambertian { albedo_: *albedo })
+    pub fn new_lambertian(albedo: Vec3) -> Self {
+        Material::Lambertian(Lambertian { albedo })
     }
 
-    pub fn new_metal(albedo: &Vec3, fuzz: f64) -> Self {
-        Material::Metal(Metal {
-            albedo_: *albedo,
-            fuzz_: fuzz,
-        })
+    pub fn new_metal(albedo: Vec3, fuzz: f64) -> Self {
+        Material::Metal(Metal { albedo, fuzz })
     }
 
-    pub fn new_dielectric(refraction_index: f64) -> Self {
-        Material::Dielectric(Dielectric {
-            refraction_: refraction_index,
-        })
+    pub fn new_dielectric(refraction: f64) -> Self {
+        Material::Dielectric(Dielectric { refraction })
     }
 
     pub fn scatter<R: Rng>(&self, r: &Ray, hit_record: &HitRecord, rng: &mut R) -> Option<Ray> {
@@ -48,38 +43,39 @@ impl Material {
 
 #[derive(Clone, Copy)]
 pub struct Lambertian {
-    pub albedo_: Vec3,
+    pub albedo: Vec3,
 }
 
 impl Lambertian {
     fn scatter<R: Rng>(&self, _r: &Ray, hit_record: &HitRecord, rng: &mut R) -> Option<Ray> {
-        let scatter_dir = hit_record.normal_ + Vec3::random_in_hemisphere(&hit_record.normal_, rng);
+        let scatter_dir =
+            hit_record.out_normal + Vec3::random_in_hemisphere(&hit_record.out_normal, rng);
 
-        Some(Ray::new(&hit_record.p_, &scatter_dir))
+        Some(Ray::new(hit_record.hit_point, scatter_dir))
     }
 
     fn attenuation(&self) -> Vec3 {
         // try albedo_ / p_
-        self.albedo_
+        self.albedo
     }
 }
 
 #[derive(Clone, Copy)]
 pub struct Metal {
-    pub albedo_: Vec3,
-    pub fuzz_: f64,
+    pub albedo: Vec3,
+    pub fuzz: f64,
 }
 
 impl Metal {
     fn scatter<R: Rng>(&self, r: &Ray, hit_record: &HitRecord, rng: &mut R) -> Option<Ray> {
         let reflect = |v: &Vec3, norm: &Vec3| -> Vec3 { v - 2. * Vec3::dot(v, norm) * norm };
 
-        let reflection = reflect(&Vec3::unit_vector(&r.direction()), &hit_record.normal_);
+        let reflection = reflect(&Vec3::unit_vector(r.direction()), &hit_record.out_normal);
         let scatter = Ray::new(
-            &hit_record.p_,
-            &(reflection + self.fuzz_ * Vec3::random_in_unit_sphere(rng)),
+            hit_record.hit_point,
+            reflection + self.fuzz * Vec3::random_in_unit_sphere(rng),
         );
-        if Vec3::dot(&scatter.direction(), &hit_record.normal_) > 0. {
+        if Vec3::dot(&scatter.direction(), &hit_record.out_normal) > 0. {
             Some(scatter)
         } else {
             None
@@ -87,38 +83,38 @@ impl Metal {
     }
 
     fn attenuation(&self) -> Vec3 {
-        self.albedo_
+        self.albedo
     }
 }
 
 #[derive(Clone, Copy)]
 pub struct Dielectric {
-    pub refraction_: f64,
+    pub refraction: f64,
 }
 
 impl Dielectric {
     fn scatter<R: Rng>(&self, r: &Ray, hit_record: &HitRecord, rng: &mut R) -> Option<Ray> {
         let reflect = |v: &Vec3, norm: &Vec3| -> Vec3 { v - 2. * Vec3::dot(v, norm) * norm };
-        let refraction_ratio = if hit_record.front_face_ {
-            1. / self.refraction_
+        let refraction_ratio = if hit_record.front_face {
+            1. / self.refraction
         } else {
-            self.refraction_
+            self.refraction
         };
 
-        let unit_dir = Vec3::unit_vector(&r.direction());
+        let unit_dir = Vec3::unit_vector(r.direction());
 
-        let cos_theta = Vec3::dot(&(-unit_dir), &hit_record.normal_).min(1.);
+        let cos_theta = Vec3::dot(&(-unit_dir), &hit_record.out_normal).min(1.);
         let sin_theta = (1. - cos_theta * cos_theta).sqrt();
 
         let cannot_refract = refraction_ratio * sin_theta > 1.;
         let direction =
             if cannot_refract || Dielectric::reflectance(cos_theta, refraction_ratio) > rng.gen() {
-                reflect(&unit_dir, &hit_record.normal_)
+                reflect(&unit_dir, &hit_record.out_normal)
             } else {
-                self.refract(&unit_dir, &hit_record.normal_, refraction_ratio)
+                self.refract(&unit_dir, &hit_record.out_normal, refraction_ratio)
             };
 
-        Some(Ray::new(&hit_record.p_, &direction))
+        Some(Ray::new(hit_record.hit_point, direction))
     }
 
     fn refract(&self, uv: &Vec3, n: &Vec3, eta: f64) -> Vec3 {

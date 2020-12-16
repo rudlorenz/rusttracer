@@ -10,29 +10,29 @@ pub trait Hitable {
 }
 
 pub struct HitRecord {
-    pub front_face_: bool,
-    pub t_: f64,
-    pub p_: Point3,
-    pub normal_: Vec3,
-    pub material_: Material,
+    pub front_face: bool,
+    pub t: f64,
+    pub hit_point: Point3,
+    pub out_normal: Vec3,
+    pub material: Material,
 }
 
 impl HitRecord {
     pub fn new(
         t: f64,
-        p: &Point3,
-        normal: &Vec3,
-        ray_direction: &Vec3,
+        hit_point: Point3,
+        normal: Vec3,
+        ray_direction: Vec3,
         material: Material,
     ) -> HitRecord {
-        let front_face = Vec3::dot(ray_direction, normal) < 0.;
-        let out_normal = if front_face { *normal } else { -normal };
+        let front_face = Vec3::dot(&ray_direction, &normal) < 0.;
+        let out_normal = if front_face { normal } else { -normal };
         HitRecord {
-            front_face_: front_face,
-            t_: t,
-            p_: *p,
-            normal_: out_normal,
-            material_: material,
+            front_face,
+            t,
+            hit_point,
+            out_normal,
+            material,
         }
     }
 }
@@ -48,7 +48,7 @@ impl Hitable for HitList {
 
         for item in &self.elements_ {
             if let Some(hit) = item.hit(r, t_min, closest_so_far) {
-                closest_so_far = hit.t_;
+                closest_so_far = hit.t;
                 last_hit = Some(hit);
             }
         }
@@ -65,9 +65,9 @@ impl HitList {
     pub fn random_scene() -> HitList {
         let horizon = Box::new(Sphere::new(
             10000.,
-            &Vec3::new(0., -10000., 0.),
+            Vec3::new(0., -10000., 0.),
             //Material::new_metal(&Vec3::new(0.4, 0.4, 0.4), 0.7),
-            Material::new_lambertian(&Point3::new(0.6, 0.6, 0.6)),
+            Material::new_lambertian(Point3::new(0.6, 0.6, 0.6)),
         ));
 
         let mut result = HitList {
@@ -93,28 +93,28 @@ impl HitList {
                             let albedo = rand_color * rand_color;
                             result.push(Box::new(Sphere::new(
                                 0.2,
-                                &point,
-                                Material::new_lambertian(&albedo),
+                                point,
+                                Material::new_lambertian(albedo),
                             )));
                         }
                         1 => {
                             let albedo = Point3::new(
-                                rng.gen_range(0.5, 1.),
-                                rng.gen_range(0.5, 1.),
-                                rng.gen_range(0.5, 1.),
+                                rng.gen_range(0.2, 1.),
+                                rng.gen_range(0.2, 1.),
+                                rng.gen_range(0.2, 1.),
                             );
                             let fuzz = rng.gen();
                             result.push(Box::new(Sphere::new(
                                 0.2,
-                                &point,
-                                Material::new_metal(&albedo, fuzz),
+                                point,
+                                Material::new_metal(albedo, fuzz),
                             )));
                         }
                         2 => {
                             let diff_idx = rng.gen_range(0., 2.5);
                             result.push(Box::new(Sphere::new(
                                 0.2,
-                                &point,
+                                point,
                                 Material::new_dielectric(diff_idx),
                             )));
                         }
@@ -128,18 +128,18 @@ impl HitList {
 
         result.push(Box::new(Sphere::new(
             1.,
-            &Point3::new(0., 1., 0.),
+            Point3::new(0., 1., 0.),
             Material::new_dielectric(1.5),
         )));
         result.push(Box::new(Sphere::new(
             1.,
-            &Point3::new(-4., 1., 0.),
-            Material::new_lambertian(&Point3::new(0.4, 0.2, 0.1)),
+            Point3::new(-4., 1., 0.),
+            Material::new_lambertian(Point3::new(0.4, 0.2, 0.1)),
         )));
         result.push(Box::new(Sphere::new(
             1.,
-            &Point3::new(4., 1., 0.),
-            Material::new_metal(&Point3::new(0.7, 0.6, 0.5), 0.),
+            Point3::new(4., 1., 0.),
+            Material::new_metal(Point3::new(0.7, 0.6, 0.5), 0.),
         )));
 
         result
