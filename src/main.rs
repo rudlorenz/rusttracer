@@ -18,8 +18,8 @@ fn main() {
     let lookat = Vec3::new(0., 0., 0.);
     let vup = Vec3::new(0., 1., 0.);
     let dist_to_focus = (lookfrom - lookat).length();
-    let aperture = 0.2;
-    let vertical_fov = 40.;
+    let aperture = 0.1;
+    let vertical_fov = 60.;
 
     let viewport = Viewport::new(
         lookfrom,
@@ -36,7 +36,7 @@ fn main() {
         img_height,
         samples,
         ray_depth,
-        &HitList::random_scene(),
+        &HitList::more_random_scene(),
     );
 
     let img_buf: ImageBuffer<Rgb<u8>, Vec<u8>> =

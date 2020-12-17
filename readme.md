@@ -8,4 +8,10 @@ Also check out <https://raytracing.github.io/>
 
 ## Results
 
+
+### Random scene
 ![random_scene](result_random_scene.png)
+
+### More random scene
+
+![more_random_scene](result_more_random_scene.png)
