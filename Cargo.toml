@@ -9,10 +9,12 @@ edition = "2018"
 [lib]
 name = "rusttracer"
 path = "src/lib.rs"
+bench = false
 
 [[bin]]
 name = "rusttracer-bin"
 path = "src/main.rs"
+bench = false
 
 [dependencies]
 overload = "0.1.1"
@@ -20,3 +22,10 @@ image = "0.23.12"
 rand = "0.7.3"
 rayon = "1.5.0"
 num = "0.3.1"
+
+[dev-dependencies]
+criterion = "0.3.3"
+
+[[bench]]
+name = "100scene"
+harness = false
