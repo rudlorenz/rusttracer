@@ -1,7 +1,6 @@
-use crate::structs::bvh::BVHNode;
-use crate::structs::hitable::*;
-use crate::structs::vec3::Vec3;
-use crate::structs::viewport::Viewport;
+use rusttracer::structs::bvh::BVHNode;
+use rusttracer::structs::vec3::Vec3;
+use rusttracer::structs::viewport::Viewport;
 
 extern crate image;
 use image::{ImageBuffer, Rgb};

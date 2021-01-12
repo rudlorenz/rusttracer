@@ -1,7 +1,7 @@
+use crate::structs::bvh::BVHNode;
 use crate::structs::hitable::Hitable;
 use crate::structs::ray::Ray;
 use crate::structs::vec3::{Point3, Vec3};
-use crate::structs::bvh::BVHNode;
 
 use rand::Rng;
 
