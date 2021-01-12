@@ -1,8 +1,5 @@
-mod structs;
-
-use crate::structs::hitable::*;
-use crate::structs::vec3::Vec3;
-use crate::structs::viewport::Viewport;
+use rusttracer::structs::vec3::Vec3;
+use rusttracer::structs::viewport::Viewport;
 
 extern crate image;
 use image::{ImageBuffer, Rgb};
@@ -11,10 +8,10 @@ fn main() {
     let aspect_ratio = 16. / 9.;
     let img_width = 1200u32;
     let img_height = (img_width as f64 / aspect_ratio) as u32;
-    let samples = 200;
+    let samples = 50;
     let ray_depth = 50;
 
-    let lookfrom = Vec3::new(13., 3., 3.);
+    let lookfrom = Vec3::new(8., 3., 2.);
     let lookat = Vec3::new(0., 0., 0.);
     let vup = Vec3::new(0., 1., 0.);
     let dist_to_focus = (lookfrom - lookat).length();
@@ -36,7 +33,7 @@ fn main() {
         img_height,
         samples,
         ray_depth,
-        &HitList::more_random_scene(),
+        rusttracer::benchmarking_scene(),
     );
 
     let img_buf: ImageBuffer<Rgb<u8>, Vec<u8>> =

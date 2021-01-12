@@ -88,7 +88,7 @@ impl Viewport {
         img_height: u32,
         samples: u32,
         ray_depth: u32,
-        scene: &HitList,
+        scene: HitList,
     ) -> Vec<u8> {
         (0..img_height)
             .into_par_iter()
