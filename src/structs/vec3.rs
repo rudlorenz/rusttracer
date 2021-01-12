@@ -89,6 +89,10 @@ impl Vec3 {
     pub fn length(&self) -> f64 {
         Vec3::dot(self, self).sqrt()
     }
+
+    pub fn as_array(self) -> [f64; 3] {
+        [self.x_, self.y_, self.z_]
+    }
 }
 
 impl fmt::Display for Vec3 {
