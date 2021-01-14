@@ -2,6 +2,7 @@ extern crate overload;
 use overload::overload;
 use std::fmt;
 use std::ops;
+use std::ops::{Index, IndexMut};
 
 use rand::distributions::Uniform;
 use rand::prelude::*;
@@ -92,6 +93,30 @@ impl Vec3 {
 
     pub fn as_array(self) -> [f64; 3] {
         [self.x_, self.y_, self.z_]
+    }
+}
+
+impl Index<u8> for Vec3 {
+    type Output = f64;
+
+    fn index(&self, index: u8) -> &Self::Output {
+        match index {
+            0 => &self.x_,
+            1 => &self.y_,
+            2 => &self.z_,
+            _ => panic!("out of bounds!"),
+        }
+    }
+}
+
+impl IndexMut<u8> for Vec3 {
+    fn index_mut(&mut self, index: u8) -> &mut Self::Output {
+        match index {
+            0 => &mut self.x_,
+            1 => &mut self.y_,
+            2 => &mut self.z_,
+            _ => panic!("out of bounds!"),
+        }
     }
 }
 

@@ -1,8 +1,7 @@
-use rusttracer::structs::bvh::BVHNode;
+use rusttracer::structs::bvh::BVH;
 use rusttracer::structs::vec3::Vec3;
 use rusttracer::structs::viewport::Viewport;
 
-extern crate image;
 use image::{ImageBuffer, Rgb};
 
 fn main() {
@@ -34,7 +33,7 @@ fn main() {
         img_height,
         samples,
         ray_depth,
-        BVHNode::new(rusttracer::benchmarking_scene()),
+        BVH::new(rusttracer::benchmarking_scene()),
     );
 
     let img_buf: ImageBuffer<Rgb<u8>, Vec<u8>> =

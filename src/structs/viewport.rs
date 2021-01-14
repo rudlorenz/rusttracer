@@ -1,4 +1,4 @@
-use crate::structs::bvh::BVHNode;
+use crate::structs::bvh::BVH;
 use crate::structs::hitable::Hitable;
 use crate::structs::ray::Ray;
 use crate::structs::vec3::{Point3, Vec3};
@@ -62,7 +62,7 @@ impl Viewport {
         )
     }
 
-    fn ray_col<R: Rng>(r: &Ray, scene: &BVHNode, rng: &mut R, depth: u32) -> Option<Vec3> {
+    fn ray_col<R: Rng>(r: &Ray, scene: &BVH, rng: &mut R, depth: u32) -> Option<Vec3> {
         if depth != 0 {
             match scene.hit(r, 0.001, f64::MAX) {
                 Some(hit_rec) => {
@@ -89,7 +89,7 @@ impl Viewport {
         img_height: u32,
         samples: u32,
         ray_depth: u32,
-        scene: BVHNode,
+        scene: BVH,
     ) -> Vec<u8> {
         (0..img_height)
             .into_par_iter()

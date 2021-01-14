@@ -8,14 +8,20 @@ pub struct Sphere {
     radius: f64,
     center: Point3,
     material: Material,
+    bbox: AABB,
 }
 
 impl Sphere {
     pub fn new(radius: f64, center: Point3, material: Material) -> Sphere {
+        let bbox = AABB::new(
+            center - Vec3::new(radius, radius, radius),
+            center + Vec3::new(radius, radius, radius),
+        );
         Sphere {
             radius,
             center,
             material,
+            bbox
         }
     }
 }
@@ -54,10 +60,6 @@ impl Hitable for Sphere {
     }
 
     fn bounding_box(&self) -> Option<AABB> {
-        let bbox = AABB::new(
-            self.center - Vec3::new(self.radius, self.radius, self.radius),
-            self.center + Vec3::new(self.radius, self.radius, self.radius),
-        );
-        Some(bbox)
+        Some(self.bbox)
     }
 }
