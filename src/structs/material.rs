@@ -1,6 +1,7 @@
 use crate::structs::hitable::HitRecord;
 use crate::structs::ray::Ray;
-use crate::structs::vec3::Vec3;
+use crate::structs::texture::Texture;
+use crate::structs::vec3::{Point3, Vec3};
 
 use rand::Rng;
 
@@ -13,7 +14,10 @@ pub enum Material {
 
 impl Material {
     pub fn new_lambertian(albedo: Vec3) -> Self {
-        Material::Lambertian(Lambertian { albedo })
+        Material::Lambertian(Lambertian::new(albedo))
+    }
+    pub fn new_lambertian_texured(texture: Texture) -> Self {
+        Material::Lambertian(Lambertian { albedo: texture })
     }
 
     pub fn new_metal(albedo: Vec3, fuzz: f64) -> Self {
@@ -32,9 +36,9 @@ impl Material {
         }
     }
 
-    pub fn attenuation(&self) -> Vec3 {
+    pub fn attenuation(&self, u: f64, v: f64, p: &Point3) -> Vec3 {
         match self {
-            Material::Lambertian(lamb) => lamb.attenuation(),
+            Material::Lambertian(lamb) => lamb.attenuation(u, v, p),
             Material::Metal(met) => met.attenuation(),
             Material::Dielectric(_) => Vec3::new(1., 1., 1.),
         }
@@ -43,10 +47,15 @@ impl Material {
 
 #[derive(Clone, Copy)]
 pub struct Lambertian {
-    pub albedo: Vec3,
+    pub albedo: Texture,
 }
 
 impl Lambertian {
+    pub fn new(p: Vec3) -> Self {
+        Lambertian {
+            albedo: Texture::new_solid_color(p),
+        }
+    }
     fn scatter<R: Rng>(&self, _r: &Ray, hit_record: &HitRecord, rng: &mut R) -> Option<Ray> {
         let scatter_dir =
             hit_record.out_normal + Vec3::random_in_hemisphere(&hit_record.out_normal, rng);
@@ -54,9 +63,9 @@ impl Lambertian {
         Some(Ray::new(hit_record.hit_point, scatter_dir))
     }
 
-    fn attenuation(&self) -> Vec3 {
+    fn attenuation(&self, u: f64, v: f64, p: &Point3) -> Vec3 {
         // try albedo_ / p_
-        self.albedo
+        self.albedo.value(u, v, p)
     }
 }
 

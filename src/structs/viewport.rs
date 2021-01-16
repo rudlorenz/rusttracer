@@ -70,7 +70,13 @@ impl Viewport {
                         if let Some(ray_col) =
                             Viewport::ray_col(&scatter_vec, &scene, rng, depth - 1)
                         {
-                            return Some(hit_rec.material.attenuation() * ray_col);
+                            return Some(
+                                hit_rec.material.attenuation(
+                                    hit_rec.u,
+                                    hit_rec.v,
+                                    &hit_rec.hit_point,
+                                ) * ray_col,
+                            );
                         }
                     }
                 }

@@ -11,6 +11,8 @@ pub trait Hitable: Sync + Send {
 pub struct HitRecord {
     pub front_face: bool,
     pub t: f64,
+    pub u: f64,
+    pub v: f64,
     pub hit_point: Point3,
     pub out_normal: Vec3,
     pub material: Material,
@@ -18,17 +20,19 @@ pub struct HitRecord {
 
 impl HitRecord {
     pub fn new(
+        front_face: bool,
         t: f64,
+        u: f64,
+        v: f64,
         hit_point: Point3,
-        normal: Vec3,
-        ray_direction: Vec3,
+        out_normal: Vec3,
         material: Material,
     ) -> HitRecord {
-        let front_face = Vec3::dot(&ray_direction, &normal) < 0.;
-        let out_normal = if front_face { normal } else { -normal };
         HitRecord {
             front_face,
             t,
+            u,
+            v,
             hit_point,
             out_normal,
             material,
