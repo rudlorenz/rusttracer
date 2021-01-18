@@ -3,6 +3,7 @@ pub mod structs;
 use crate::structs::hitable::HitList;
 use crate::structs::material::Material;
 use crate::structs::sphere::Sphere;
+use crate::structs::texture::Texture;
 use crate::structs::vec3::{Point3, Vec3};
 
 use rand::prelude::*;
@@ -175,6 +176,25 @@ pub fn debugging_scene() -> HitList {
                 100.,
                 Vec3::new(0., -100.5, -1.),
                 Material::new_metal(Vec3::new(0.4, 0.4, 0.4), 0.7),
+            )),
+        ],
+    }
+}
+
+pub fn two_spheres() -> HitList {
+    let checker_texture =
+        Texture::new_checker_color(Vec3::new(0.4, 0.4, 0.4), Vec3::new(0.18, 0.69, 0.89));
+    HitList {
+        elements: vec![
+            Box::new(Sphere::new(
+                10.,
+                Point3::new(0., -10., 0.),
+                Material::new_lambertian_texured(checker_texture),
+            )),
+            Box::new(Sphere::new(
+                10.,
+                Point3::new(0., 10., 0.),
+                Material::new_lambertian_texured(checker_texture),
             )),
         ],
     }
