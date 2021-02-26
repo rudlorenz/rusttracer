@@ -26,9 +26,9 @@ impl Material {
 
     pub fn scatter<R: Rng>(&self, r: &Ray, hit_record: &HitRecord, rng: &mut R) -> Option<Ray> {
         match self {
-            Material::Lambertian(lamb) => lamb.scatter(r, hit_record, rng),
+            Material::Lambertian(lamb) => Some(lamb.scatter(r, hit_record, rng)),
             Material::Metal(met) => met.scatter(r, hit_record, rng),
-            Material::Dielectric(diel) => diel.scatter(r, hit_record, rng),
+            Material::Dielectric(diel) => Some(diel.scatter(r, hit_record, rng)),
         }
     }
 
@@ -47,11 +47,11 @@ pub struct Lambertian {
 }
 
 impl Lambertian {
-    fn scatter<R: Rng>(&self, _r: &Ray, hit_record: &HitRecord, rng: &mut R) -> Option<Ray> {
+    fn scatter<R: Rng>(&self, _r: &Ray, hit_record: &HitRecord, rng: &mut R) -> Ray {
         let scatter_dir =
             hit_record.out_normal + Vec3::random_in_hemisphere(&hit_record.out_normal, rng);
 
-        Some(Ray::new(hit_record.hit_point, scatter_dir))
+        Ray::new(hit_record.hit_point, scatter_dir)
     }
 
     fn attenuation(&self) -> Vec3 {
@@ -93,7 +93,7 @@ pub struct Dielectric {
 }
 
 impl Dielectric {
-    fn scatter<R: Rng>(&self, r: &Ray, hit_record: &HitRecord, rng: &mut R) -> Option<Ray> {
+    fn scatter<R: Rng>(&self, r: &Ray, hit_record: &HitRecord, rng: &mut R) -> Ray {
         let reflect = |v: &Vec3, norm: &Vec3| -> Vec3 { v - 2. * Vec3::dot(v, norm) * norm };
         let refraction_ratio = if hit_record.front_face {
             1. / self.refraction
@@ -114,7 +114,7 @@ impl Dielectric {
                 self.refract(&unit_dir, &hit_record.out_normal, refraction_ratio)
             };
 
-        Some(Ray::new(hit_record.hit_point, direction))
+        Ray::new(hit_record.hit_point, direction)
     }
 
     fn refract(&self, uv: &Vec3, n: &Vec3, eta: f64) -> Vec3 {

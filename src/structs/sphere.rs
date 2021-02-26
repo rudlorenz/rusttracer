@@ -25,7 +25,7 @@ impl Hitable for Sphere {
         let a = Vec3::dot(&r.direction(), &r.direction());
         let b = Vec3::dot(&oc, &r.direction());
         let c = Vec3::dot(&oc, &oc) - self.radius * self.radius;
-        let discr = b * b - a * c;
+        let discr = b.powf(2f64) - a * c;
         if discr > 0. {
             let root = (-b - discr.sqrt()) / a;
             if root > t_min && root < t_max {
