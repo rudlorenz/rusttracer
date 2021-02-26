@@ -1,9 +1,22 @@
 use crate::structs::material::Material;
 use crate::structs::ray::Ray;
 use crate::structs::vec3::{Point3, Vec3};
+use crate::structs::sphere::Sphere;
 
-pub trait Hitable {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+pub enum Hitable {
+    Sphere(Sphere),
+}
+
+impl Hitable {
+    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        match self {
+            Hitable::Sphere(sphere) => sphere.hit(r, t_min, t_max),
+        }
+    }
+
+    pub fn new_sphere(radius: f64, center: Point3, material: Material) -> Self {
+        Hitable::Sphere(Sphere::new(radius, center, material))
+    }
 }
 
 pub struct HitRecord {
@@ -35,11 +48,21 @@ impl HitRecord {
 }
 
 pub struct HitList {
-    pub elements: Vec<Box<dyn Hitable + Send + Sync>>,
+    pub elements: Vec<Hitable>,
 }
 
-impl Hitable for HitList {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+impl HitList {
+    pub fn with_capacity(capacity: usize) -> HitList {
+        HitList {
+            elements: Vec::with_capacity(capacity),
+        }
+    }
+
+    pub fn push(&mut self, item: Hitable) {
+        self.elements.push(item);
+    }
+
+    pub(crate) fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let mut closest_so_far = t_max;
         let mut last_hit: Option<HitRecord> = None;
 
@@ -51,18 +74,6 @@ impl Hitable for HitList {
         }
 
         last_hit
-    }
-}
-
-impl HitList {
-    pub fn with_capacity(capacity: usize) -> HitList {
-        HitList {
-            elements: Vec::with_capacity(capacity),
-        }
-    }
-
-    pub fn push(&mut self, item: Box<dyn Hitable + Send + Sync>) {
-        self.elements.push(item);
     }
 
     pub fn split_off(&mut self, at: usize) -> Self {

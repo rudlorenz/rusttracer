@@ -1,4 +1,4 @@
-use crate::structs::hitable::{HitRecord, Hitable};
+use crate::structs::hitable::HitRecord;
 use crate::structs::material::Material;
 use crate::structs::ray::Ray;
 use crate::structs::vec3::{Point3, Vec3};
@@ -17,10 +17,8 @@ impl Sphere {
             material,
         }
     }
-}
 
-impl Hitable for Sphere {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    pub(crate) fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = r.origin() - self.center;
         let a = Vec3::dot(&r.direction(), &r.direction());
         let b = Vec3::dot(&oc, &r.direction());

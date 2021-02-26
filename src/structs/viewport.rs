@@ -1,4 +1,4 @@
-use crate::structs::hitable::{HitList, Hitable};
+use crate::structs::hitable::HitList;
 use crate::structs::ray::Ray;
 use crate::structs::vec3::{Point3, Vec3};
 

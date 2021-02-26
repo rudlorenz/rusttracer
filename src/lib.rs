@@ -1,19 +1,18 @@
 pub mod structs;
 
-use crate::structs::hitable::HitList;
+use crate::structs::hitable::{HitList, Hitable};
 use crate::structs::material::Material;
-use crate::structs::sphere::Sphere;
 use crate::structs::vec3::{Point3, Vec3};
 
 use rand::prelude::*;
 
 pub fn random_scene() -> HitList {
-    let horizon = Box::new(Sphere::new(
+    let horizon = Hitable::new_sphere(
         10000.,
         Vec3::new(0., -10000., 0.),
         //Material::new_metal(&Vec3::new(0.4, 0.4, 0.4), 0.7),
         Material::new_lambertian(Point3::new(0.6, 0.6, 0.6)),
-    ));
+    );
 
     let mut result = HitList::with_capacity(485);
     result.push(horizon);
@@ -35,11 +34,11 @@ pub fn random_scene() -> HitList {
                     0 => {
                         let rand_color = Point3::new(rng.gen(), rng.gen(), rng.gen());
                         let albedo = rand_color * rand_color;
-                        result.push(Box::new(Sphere::new(
+                        result.push(Hitable::new_sphere(
                             0.2,
                             point,
                             Material::new_lambertian(albedo),
-                        )));
+                        ));
                     }
                     1 => {
                         let albedo = Point3::new(
@@ -48,19 +47,19 @@ pub fn random_scene() -> HitList {
                             rng.gen_range(0.2, 1.),
                         );
                         let fuzz = rng.gen();
-                        result.push(Box::new(Sphere::new(
+                        result.push(Hitable::new_sphere(
                             0.2,
                             point,
                             Material::new_metal(albedo, fuzz),
-                        )));
+                        ));
                     }
                     2 => {
                         let diff_idx = rng.gen_range(0., 2.5);
-                        result.push(Box::new(Sphere::new(
+                        result.push(Hitable::new_sphere(
                             0.2,
                             point,
                             Material::new_dielectric(diff_idx),
-                        )));
+                        ));
                     }
                     _ => {
                         panic!("How could this happen?");
@@ -70,31 +69,31 @@ pub fn random_scene() -> HitList {
         }
     }
 
-    result.push(Box::new(Sphere::new(
+    result.push(Hitable::new_sphere(
         1.,
         Point3::new(0., 1., 0.),
         Material::new_dielectric(1.5),
-    )));
-    result.push(Box::new(Sphere::new(
+    ));
+    result.push(Hitable::new_sphere(
         1.,
         Point3::new(-4., 1., 0.),
         Material::new_lambertian(Point3::new(0.4, 0.2, 0.1)),
-    )));
-    result.push(Box::new(Sphere::new(
+    ));
+    result.push(Hitable::new_sphere(
         1.,
         Point3::new(4., 1., 0.),
         Material::new_metal(Point3::new(0.7, 0.6, 0.5), 0.),
-    )));
+    ));
 
     result
 }
 
 pub fn more_random_scene() -> HitList {
-    let horizon = Box::new(Sphere::new(
+    let horizon = Hitable::new_sphere(
         10000.,
         Vec3::new(0., -10000., 0.),
         Material::new_metal(Vec3::new(0.4, 0.4, 0.4), 0.6),
-    ));
+    );
 
     let mut result = HitList::with_capacity(485);
     result.push(horizon);
@@ -116,11 +115,11 @@ pub fn more_random_scene() -> HitList {
                 0 => {
                     let rand_color = Point3::new(rng.gen(), rng.gen(), rng.gen());
                     let albedo = rand_color * rand_color;
-                    result.push(Box::new(Sphere::new(
+                    result.push(Hitable::new_sphere(
                         radius,
                         point,
                         Material::new_lambertian(albedo),
-                    )));
+                    ));
                 }
                 1 => {
                     let albedo = Point3::new(
@@ -129,19 +128,19 @@ pub fn more_random_scene() -> HitList {
                         rng.gen_range(0.2, 1.),
                     );
                     let fuzz = rng.gen();
-                    result.push(Box::new(Sphere::new(
+                    result.push(Hitable::new_sphere(
                         radius,
                         point,
                         Material::new_metal(albedo, fuzz),
-                    )));
+                    ));
                 }
                 2 => {
                     let diff_idx = rng.gen_range(0., 2.5);
-                    result.push(Box::new(Sphere::new(
+                    result.push(Hitable::new_sphere(
                         radius,
                         point,
                         Material::new_dielectric(diff_idx),
-                    )));
+                    ));
                 }
                 _ => {
                     panic!("How could this happen?");
@@ -156,26 +155,26 @@ pub fn more_random_scene() -> HitList {
 pub fn debugging_scene() -> HitList {
     HitList {
         elements: vec![
-            Box::new(Sphere::new(
+            Hitable::new_sphere(
                 0.49,
                 Point3::new(0., 0., 0.),
                 Material::new_lambertian(Vec3::new(0.8, 0.3, 0.3)),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.49,
                 Point3::new(1., 0., -1.),
                 Material::new_metal(Vec3::new(0.5, 0.8, 0.2), 0.5),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.49,
                 Point3::new(-1., 0., -1.),
                 Material::new_dielectric(1.5),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 100.,
                 Vec3::new(0., -100.5, -1.),
                 Material::new_metal(Vec3::new(0.4, 0.4, 0.4), 0.7),
-            )),
+            ),
         ],
     }
 }
@@ -183,41 +182,41 @@ pub fn debugging_scene() -> HitList {
 pub fn benchmarking_scene() -> HitList {
     HitList {
         elements: vec![
-            Box::new(Sphere::new(
+            Hitable::new_sphere(
                 100.,
                 Vec3::new(0., -100.5, -1.),
                 Material::new_metal(Vec3::new(0.4, 0.4, 0.4), 0.7),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.46734216358139735,
                 Point3::new(-4.727413554886122, 3.5133141510894332, -4.884919007059993),
                 Material::new_dielectric(0.7048845664600739),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.29170065860774075,
                 Point3::new(-4.738925134977638, 1.0453824822493671, -3.8585817780120344),
                 Material::new_metal(
                     Point3::new(0.4827886747796102, 0.45629410955373084, 0.8121253294832369),
                     0.6731025206067434,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.6624875131560867,
                 Point3::new(-4.897778417800836, 3.3002957639501083, -2.8481154636179835),
                 Material::new_metal(
                     Point3::new(0.8394861700690097, 0.8681296988589604, 0.3874641546703753),
                     0.8702713002753906,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.29123839828234865,
                 Point3::new(-4.766284403222285, 5.128593239370207, -1.7763276014022753),
                 Material::new_metal(
                     Point3::new(0.9434628618059051, 0.3350071564464988, 0.4753800688214632),
                     0.803604212347514,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.7936115311942045,
                 Point3::new(-4.8792113247771995, 5.062046947341458, -0.8397353425169438),
                 Material::new_lambertian(Point3::new(
@@ -225,8 +224,8 @@ pub fn benchmarking_scene() -> HitList {
                     0.9215277174885657,
                     0.9729736147378965,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.6894415477907924,
                 Point3::new(-4.920834289816395, 5.569786842070711, 0.20735401760282615),
                 Material::new_lambertian(Point3::new(
@@ -234,24 +233,24 @@ pub fn benchmarking_scene() -> HitList {
                     0.042999870566949136,
                     0.000017033259185895088,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.14833299703364577,
                 Point3::new(-4.804271794217284, 4.682805056184613, 1.0113443475968311),
                 Material::new_metal(
                     Point3::new(0.20914758210644424, 0.8344825809535399, 0.28400776234637654),
                     0.5990888866324385,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.2644781005073707,
                 Point3::new(-4.869820981135378, 0.5580797700058195, 2.1569781070162257),
                 Material::new_metal(
                     Point3::new(0.345303717231765, 0.971603078562689, 0.5513803792638097),
                     0.8937063665928782,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.4264582942877815,
                 Point3::new(-4.795811779190681, 4.259700692799974, 3.227555009099858),
                 Material::new_lambertian(Point3::new(
@@ -259,13 +258,13 @@ pub fn benchmarking_scene() -> HitList {
                     0.2187080138466815,
                     0.10344549849418051,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.7033378588303947,
                 Point3::new(-4.805967190668879, 3.263468094351099, 4.078738393962545),
                 Material::new_dielectric(1.2670730284190852),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.6235434279917587,
                 Point3::new(-3.973071393985803, 2.1234686044636435, -4.922336404402467),
                 Material::new_lambertian(Point3::new(
@@ -273,8 +272,8 @@ pub fn benchmarking_scene() -> HitList {
                     0.5328235561864642,
                     0.0058482214987044135,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.25496390141722625,
                 Point3::new(-3.810087451909979, 1.644769482768283, -3.965107902253459),
                 Material::new_lambertian(Point3::new(
@@ -282,8 +281,8 @@ pub fn benchmarking_scene() -> HitList {
                     0.16792587284219604,
                     0.8399139597495902,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.1995495220077706,
                 Point3::new(-3.846995258070238, 1.3054493670834557, -2.920554445096145),
                 Material::new_lambertian(Point3::new(
@@ -291,8 +290,8 @@ pub fn benchmarking_scene() -> HitList {
                     0.8571892428050112,
                     0.8868896894496019,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.2295697893535784,
                 Point3::new(-3.9061662880222463, 4.51305921800898, -1.9436152572155083),
                 Material::new_lambertian(Point3::new(
@@ -300,68 +299,68 @@ pub fn benchmarking_scene() -> HitList {
                     0.8862002636383263,
                     0.8592722604458666,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.7930863436950211,
                 Point3::new(-3.9242925559923556, 5.056136004686254, -0.9242980753714377),
                 Material::new_dielectric(1.8412307542882866),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.26978492925437625,
                 Point3::new(-3.76550994420852, 2.004065321018341, 0.1743034356975356),
                 Material::new_metal(
                     Point3::new(0.7111714013927495, 0.5168489009217854, 0.7800127610189258),
                     0.03444483465038106,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.4221353003234326,
                 Point3::new(-3.8263980529033366, 2.4247119336967513, 1.1818208212118355),
                 Material::new_dielectric(1.066156657815633),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.5413718246593008,
                 Point3::new(-3.8710743923756605, 5.245275349728147, 2.125960983796847),
                 Material::new_metal(
                     Point3::new(0.5586338316504087, 0.7350475712475526, 0.21691397127474163),
                     0.5980581264955264,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.3716206207467889,
                 Point3::new(-3.906881952733702, 2.1586353628604593, 3.170190237853585),
                 Material::new_metal(
                     Point3::new(0.8274380520065658, 0.31882022352506906, 0.36103251010920784),
                     0.6545228481310364,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.49283403628368816,
                 Point3::new(-3.884756765238088, 1.5211970884404526, 4.247450512596577),
                 Material::new_dielectric(1.8110970016581451),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.32941456475040365,
                 Point3::new(-2.924754106982982, 3.2568212595902173, -4.8879772959123935),
                 Material::new_dielectric(0.8257755318217325),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.5269420652721228,
                 Point3::new(-2.8801894515007187, 1.509602941087445, -3.7689695663604574),
                 Material::new_metal(
                     Point3::new(0.32305865926901023, 0.3184923371678622, 0.8303304877527269),
                     0.40337258941964893,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.2465273263196476,
                 Point3::new(-2.8496945944109964, 3.5688160352698763, -2.9421114067520775),
                 Material::new_metal(
                     Point3::new(0.66829925620171, 0.6775318775163304, 0.7649227679748505),
                     0.5051289186652339,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.23178157478901404,
                 Point3::new(-2.977396591949854, 5.134971549643788, -1.956640653836145),
                 Material::new_lambertian(Point3::new(
@@ -369,39 +368,39 @@ pub fn benchmarking_scene() -> HitList {
                     0.23469280314130808,
                     0.4744015018741627,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.14610187411953082,
                 Point3::new(-2.833616355614151, 2.9860130797332385, -0.808416449308993),
                 Material::new_dielectric(2.4444165511074454),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.6269171104024208,
                 Point3::new(-2.822637223715912, 0.9314709901311714, 0.015041440035637475),
                 Material::new_metal(
                     Point3::new(0.2841507137123895, 0.9222039207743935, 0.9735288094879326),
                     0.3360650211359638,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.40294114427084005,
                 Point3::new(-2.8219096992610138, 1.4804734355783138, 1.0224014472785397),
                 Material::new_metal(
                     Point3::new(0.25313483283971544, 0.6963874468497626, 0.3250921669351199),
                     0.4735829263317305,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.1719577545773717,
                 Point3::new(-2.8563301116624693, 4.392115779630947, 2.0778996520109794),
                 Material::new_dielectric(0.6967647302770408),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.6633226784769011,
                 Point3::new(-2.9963886351646947, 4.687044588795423, 3.210310089199905),
                 Material::new_dielectric(0.4354922016099344),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.5814014900902487,
                 Point3::new(-2.918299080170682, 3.453241269961728, 4.265066048082231),
                 Material::new_lambertian(Point3::new(
@@ -409,13 +408,13 @@ pub fn benchmarking_scene() -> HitList {
                     0.01475821695871177,
                     0.7498278382362806,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.41659362231371977,
                 Point3::new(-1.7333641565496558, 1.5794646617527195, -4.8848418703356655),
                 Material::new_dielectric(1.980698510366648),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.4538023332844314,
                 Point3::new(-1.8389501532337909, 3.491005002162992, -3.8807007423279796),
                 Material::new_lambertian(Point3::new(
@@ -423,13 +422,13 @@ pub fn benchmarking_scene() -> HitList {
                     0.014530479686374623,
                     0.0009568945474885141,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.2791048821594634,
                 Point3::new(-1.975041126291926, 1.3460910804754955, -2.944320158364385),
                 Material::new_dielectric(0.8717825625187847),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.6895847625342638,
                 Point3::new(-1.70655810160117, 3.4344683418094317, -1.8123951040745645),
                 Material::new_lambertian(Point3::new(
@@ -437,8 +436,8 @@ pub fn benchmarking_scene() -> HitList {
                     0.7098869897013641,
                     0.2925467505843992,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.25024291284055794,
                 Point3::new(-1.9710080035352666, 1.488266022824489, -0.810765071635988),
                 Material::new_lambertian(Point3::new(
@@ -446,21 +445,21 @@ pub fn benchmarking_scene() -> HitList {
                     0.017507295891458836,
                     0.608364572718273,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.7706683606095518,
                 Point3::new(-1.969721208746303, 2.6397938186198986, 0.15881911526837988),
                 Material::new_dielectric(1.7843478753107327),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.22830449469289457,
                 Point3::new(-1.9983409517247817, 1.4904971841292145, 1.228095572081888),
                 Material::new_metal(
                     Point3::new(0.6813418917745031, 0.942485365141362, 0.8802542582300203),
                     0.3628382762535399,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.1454315848476539,
                 Point3::new(-1.7586976100054779, 2.6098069406089905, 2.2554662339113865),
                 Material::new_lambertian(Point3::new(
@@ -468,13 +467,13 @@ pub fn benchmarking_scene() -> HitList {
                     0.10193918271694886,
                     0.017400661187590157,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.6092010712240006,
                 Point3::new(-1.95578561856021, 1.8523541538698265, 3.1179299293850686),
                 Material::new_dielectric(2.1706287200711802),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.6650892906069338,
                 Point3::new(-1.778549675561888, 4.100298823748426, 4.236820853425862),
                 Material::new_lambertian(Point3::new(
@@ -482,24 +481,24 @@ pub fn benchmarking_scene() -> HitList {
                     0.008808504273745172,
                     0.6835385709069554,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.10646426414134501,
                 Point3::new(-0.899121872324185, 1.8965985986556377, -4.821937022701416),
                 Material::new_metal(
                     Point3::new(0.32691629304449277, 0.8559982157227817, 0.6752350753941041),
                     0.6597160865686512,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.6537547874182638,
                 Point3::new(-0.7212997286432727, 4.947778272672718, -3.718676871128771),
                 Material::new_metal(
                     Point3::new(0.9872225226971727, 0.7138642008067455, 0.5865509238990392),
                     0.02475074599258975,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.15481155915336067,
                 Point3::new(-0.8415733467650943, 1.8362679384244265, -2.9749906038157263),
                 Material::new_lambertian(Point3::new(
@@ -507,16 +506,16 @@ pub fn benchmarking_scene() -> HitList {
                     0.3546225921721765,
                     0.0000022997835542377954,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.5454523305168285,
                 Point3::new(-0.9782969539978753, 3.123266895580095, -1.7570224202106108),
                 Material::new_metal(
                     Point3::new(0.31638887683665495, 0.6329146189347097, 0.5900993999918853),
                     0.8474006401273599,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.5295309105244728,
                 Point3::new(-0.7259492428064274, 4.162077466342401, -0.8536680740206285),
                 Material::new_lambertian(Point3::new(
@@ -524,16 +523,16 @@ pub fn benchmarking_scene() -> HitList {
                     0.2015438041478981,
                     0.3884472624847721,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.24874789053273,
                 Point3::new(-0.7372180678860858, 1.8970833312329383, 0.2703256063153758),
                 Material::new_metal(
                     Point3::new(0.3231981238785915, 0.9774592545510765, 0.7996312008516444),
                     0.3217460173772603,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.16452952007160745,
                 Point3::new(-0.8730042803658853, 0.7225413917237917, 1.0614853138559817),
                 Material::new_lambertian(Point3::new(
@@ -541,8 +540,8 @@ pub fn benchmarking_scene() -> HitList {
                     0.9072667442782513,
                     0.8568111312127487,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.483931645128702,
                 Point3::new(-0.7299566410062222, 1.6495520871675025, 2.0557467030075327),
                 Material::new_lambertian(Point3::new(
@@ -550,13 +549,13 @@ pub fn benchmarking_scene() -> HitList {
                     0.047223488848022,
                     0.6619278014789917,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.6728376727837493,
                 Point3::new(-0.8651762576232384, 4.9758328213060565, 3.0816876040669747),
                 Material::new_dielectric(0.6941927901685457),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.35359338368000515,
                 Point3::new(-0.8323471198979828, 2.610452435055164, 4.251088624966122),
                 Material::new_lambertian(Point3::new(
@@ -564,13 +563,13 @@ pub fn benchmarking_scene() -> HitList {
                     0.8154041739178918,
                     0.4532313747508982,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.7751861990895842,
                 Point3::new(0.18933668056663713, 1.4858867599426957, -4.828640894726582),
                 Material::new_dielectric(0.6996832984033846),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.20619360156400007,
                 Point3::new(0.08243668632095102, 3.1077629379254414, -3.9413517243228373),
                 Material::new_lambertian(Point3::new(
@@ -578,8 +577,8 @@ pub fn benchmarking_scene() -> HitList {
                     0.29188756851326986,
                     0.00048023588788762516,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.47568496820285466,
                 Point3::new(0.2758725590684428, 3.880269476848128, -2.877296558453171),
                 Material::new_lambertian(Point3::new(
@@ -587,16 +586,16 @@ pub fn benchmarking_scene() -> HitList {
                     0.22309638096845436,
                     0.714530948104158,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.13905070427293706,
                 Point3::new(0.016617664348868664, 0.8642740583298879, -1.742692395545392),
                 Material::new_metal(
                     Point3::new(0.853897528382549, 0.7082809868303448, 0.3347602907885152),
                     0.7531026488376918,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.1852530398764341,
                 Point3::new(0.166244248752519, 1.756295842305876, -0.7619159062237773),
                 Material::new_lambertian(Point3::new(
@@ -604,21 +603,21 @@ pub fn benchmarking_scene() -> HitList {
                     0.014932870181892358,
                     0.38998511956642135,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.5702682249459101,
                 Point3::new(0.1539684203524912, 4.887847764591491, 0.1392453439121112),
                 Material::new_metal(
                     Point3::new(0.6844187536373602, 0.5214885360377788, 0.9666224047748624),
                     0.9125630845437366,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.17998891856177762,
                 Point3::new(0.14075647103348293, 1.694725185938264, 1.2291412020198047),
                 Material::new_dielectric(0.16285945058484075),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.7977613773432967,
                 Point3::new(0.16225330032926036, 3.497556256495278, 2.2069012210642085),
                 Material::new_lambertian(Point3::new(
@@ -626,8 +625,8 @@ pub fn benchmarking_scene() -> HitList {
                     0.0026942839680463996,
                     0.3543177131019629,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.6086854736156967,
                 Point3::new(0.2741884103460898, 0.9454941115039762, 3.0466237640780913),
                 Material::new_lambertian(Point3::new(
@@ -635,21 +634,21 @@ pub fn benchmarking_scene() -> HitList {
                     0.6634706858521037,
                     0.7355471181373787,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.654892998173584,
                 Point3::new(0.16567045983849651, 2.619537599538667, 4.171018238219903),
                 Material::new_metal(
                     Point3::new(0.49527656544570997, 0.5108903015901243, 0.2181840841852475),
                     0.4950581714738683,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.4177466589842148,
                 Point3::new(1.2858479057700136, 1.9280863143588634, -4.7813550580518305),
                 Material::new_dielectric(0.3210424477847684),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.7258312598233709,
                 Point3::new(1.237300283253437, 5.466872964734225, -3.7155491287594193),
                 Material::new_lambertian(Point3::new(
@@ -657,24 +656,24 @@ pub fn benchmarking_scene() -> HitList {
                     0.3435518899060352,
                     0.19476154048166824,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.17410384237213744,
                 Point3::new(1.0062727211234173, 3.000852615357732, -2.8737290094941796),
                 Material::new_metal(
                     Point3::new(0.5382471852460735, 0.5821761831137012, 0.6933772996746386),
                     0.6344062536664707,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.5098309596823527,
                 Point3::new(1.0323960685412854, 4.543223685528066, -1.8827014232151087),
                 Material::new_metal(
                     Point3::new(0.8480729299998249, 0.8380748948202896, 0.805835261296191),
                     0.4282163852703601,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.7182297013705542,
                 Point3::new(1.0318991430307172, 1.4039914464240288, -0.8042687490675375),
                 Material::new_lambertian(Point3::new(
@@ -682,13 +681,13 @@ pub fn benchmarking_scene() -> HitList {
                     0.001114545863943758,
                     0.002101713485551317,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.4222861741137456,
                 Point3::new(1.2730901996215913, 3.672451170029176, 0.1533454055148947),
                 Material::new_dielectric(0.4290104281428253),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.44987660359922166,
                 Point3::new(1.2167037947511439, 4.923014224147662, 1.0963971717885812),
                 Material::new_lambertian(Point3::new(
@@ -696,8 +695,8 @@ pub fn benchmarking_scene() -> HitList {
                     0.7224773803142244,
                     0.07319573648560794,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.42534550179614716,
                 Point3::new(1.1613494585144082, 4.286931695678206, 2.163931314733026),
                 Material::new_lambertian(Point3::new(
@@ -705,16 +704,16 @@ pub fn benchmarking_scene() -> HitList {
                     0.4507434396324886,
                     0.13263944680596762,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.2696673137122667,
                 Point3::new(1.0216766462738869, 1.0940680802399398, 3.1656645182830583),
                 Material::new_metal(
                     Point3::new(0.3448457673091333, 0.8180836759976198, 0.3181367491465743),
                     0.70895441688012,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.7169009789981834,
                 Point3::new(1.252971040873537, 4.182517536210218, 4.137540050526012),
                 Material::new_lambertian(Point3::new(
@@ -722,8 +721,8 @@ pub fn benchmarking_scene() -> HitList {
                     0.8687607093193448,
                     0.03689329649508099,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.5291149705020675,
                 Point3::new(2.0219390636463395, 1.4888765323818336, -4.890805402348553),
                 Material::new_lambertian(Point3::new(
@@ -731,16 +730,16 @@ pub fn benchmarking_scene() -> HitList {
                     0.851895273155061,
                     0.08891082245715881,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.19367701559563233,
                 Point3::new(2.1264032742823282, 2.8635670752015385, -3.8488692835766942),
                 Material::new_metal(
                     Point3::new(0.3721955613454524, 0.676761418511145, 0.7289325114723633),
                     0.589064590895847,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.3119154625745971,
                 Point3::new(2.276009285436013, 2.4127213952842093, -2.861542502123488),
                 Material::new_lambertian(Point3::new(
@@ -748,8 +747,8 @@ pub fn benchmarking_scene() -> HitList {
                     0.33595878076830143,
                     0.6425231407070987,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.5514096539728579,
                 Point3::new(2.174019232937262, 4.142714399341377, -1.7887321941141932),
                 Material::new_lambertian(Point3::new(
@@ -757,16 +756,16 @@ pub fn benchmarking_scene() -> HitList {
                     0.824165720474797,
                     0.1545113013063164,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.7662032123223621,
                 Point3::new(2.0458375317532043, 2.0045276195114297, -0.7487349298884043),
                 Material::new_metal(
                     Point3::new(0.5445870794580427, 0.3170852994226813, 0.5122490477426052),
                     0.9810531254182593,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.4926407975214726,
                 Point3::new(2.287669768719222, 0.8705177439881313, 0.16692646148285298),
                 Material::new_lambertian(Point3::new(
@@ -774,26 +773,26 @@ pub fn benchmarking_scene() -> HitList {
                     0.8235691087102158,
                     0.8055679024577777,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.5298666958093207,
                 Point3::new(2.222648390221197, 3.660456447788431, 1.0199771334433543),
                 Material::new_dielectric(0.6909791200589921),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.6620965927363018,
                 Point3::new(2.2495377683262876, 0.9315306289568401, 2.1559416999685643),
                 Material::new_dielectric(2.324107647607212),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.1957356662094158,
                 Point3::new(2.118098704833106, 2.48651095067376, 3.1626545613259767),
                 Material::new_metal(
                     Point3::new(0.786043771460754, 0.7692681481734034, 0.23236815524104576),
                     0.03485389435517028,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.47580734474033126,
                 Point3::new(2.0109607240749874, 1.3016189975239436, 4.286339234532035),
                 Material::new_lambertian(Point3::new(
@@ -801,37 +800,37 @@ pub fn benchmarking_scene() -> HitList {
                     0.25790379522254653,
                     0.020863970592285765,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.6846569141548303,
                 Point3::new(3.0921665317746747, 2.313306235503589, -4.719756622181483),
                 Material::new_metal(
                     Point3::new(0.4133011186060571, 0.2555975330879916, 0.4088388719563362),
                     0.6903333938936954,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.31154724207126994,
                 Point3::new(3.125682315857124, 5.243950121973633, -3.8533913880065738),
                 Material::new_dielectric(1.2178477188546006),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.43121007721676896,
                 Point3::new(3.0065301843461025, 4.5496846515614235, -2.8819951697359447),
                 Material::new_metal(
                     Point3::new(0.9819830657531856, 0.34608544244675987, 0.5723538512791169),
                     0.08666546639834427,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.29867920798918823,
                 Point3::new(3.204948411565694, 4.118562645800594, -1.8134790607467057),
                 Material::new_metal(
                     Point3::new(0.2726400959714811, 0.625072538069833, 0.5349440559481482),
                     0.11645086576371488,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.4405446548386841,
                 Point3::new(3.072192963407641, 3.9878007680984466, -0.8219538424705688),
                 Material::new_lambertian(Point3::new(
@@ -839,24 +838,24 @@ pub fn benchmarking_scene() -> HitList {
                     0.03839038734831755,
                     0.01387912488894878,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.4273753593159826,
                 Point3::new(3.0955254960217915, 2.7843089100072094, 0.1344475954757456),
                 Material::new_metal(
                     Point3::new(0.31573825921616533, 0.9545835842783796, 0.9035715839636809),
                     0.2527323113413984,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.5303739574950923,
                 Point3::new(3.175928501827305, 3.10431379020814, 1.292654849536944),
                 Material::new_metal(
                     Point3::new(0.5833559892869089, 0.29659742332649125, 0.46222043994886114),
                     0.7306223268196054,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.5193446197034951,
                 Point3::new(3.194541129909859, 2.4443572550563557, 2.18998418510945),
                 Material::new_lambertian(Point3::new(
@@ -864,16 +863,16 @@ pub fn benchmarking_scene() -> HitList {
                     0.012132900752075449,
                     0.005594480129006499,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.3224480444321398,
                 Point3::new(3.2861100292423004, 2.4510947422672213, 3.1197024609203345),
                 Material::new_metal(
                     Point3::new(0.5316567823489338, 0.9822793068033984, 0.5278283640119176),
                     0.841970568463353,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.3436347954714112,
                 Point3::new(3.272395415781223, 4.323957914930495, 4.282070333937621),
                 Material::new_lambertian(Point3::new(
@@ -881,8 +880,8 @@ pub fn benchmarking_scene() -> HitList {
                     0.42620682141942967,
                     0.010120970256655235,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.5874918570715429,
                 Point3::new(4.000496491806838, 0.9101350337781448, -4.714800700801606),
                 Material::new_lambertian(Point3::new(
@@ -890,16 +889,16 @@ pub fn benchmarking_scene() -> HitList {
                     0.21139508903595847,
                     0.1566216991537586,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.5191340388134692,
                 Point3::new(4.208644124726013, 3.336152102718213, -3.7884748092366065),
                 Material::new_metal(
                     Point3::new(0.2153896861680883, 0.3144792551183924, 0.837810287829799),
                     0.4693765546447226,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.19226751602965647,
                 Point3::new(4.021757605093002, 1.4997728688047844, -2.921025037236812),
                 Material::new_lambertian(Point3::new(
@@ -907,8 +906,8 @@ pub fn benchmarking_scene() -> HitList {
                     0.037372835911273494,
                     0.43686748653000157,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.639728627745237,
                 Point3::new(4.006035936392733, 0.89120619578624, -1.9797932096960305),
                 Material::new_lambertian(Point3::new(
@@ -916,29 +915,29 @@ pub fn benchmarking_scene() -> HitList {
                     0.00875651196017602,
                     0.15466579267838168,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.67948899599669,
                 Point3::new(4.2492592090812895, 2.6319103589638337, -0.7420616650400989),
                 Material::new_metal(
                     Point3::new(0.24986198855766803, 0.34071640361728606, 0.5315798424605171),
                     0.1833713498114261,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.261898757889978,
                 Point3::new(4.294187841545456, 3.6456543860895607, 0.15145569377740528),
                 Material::new_dielectric(2.2304736110712065),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.1784005144603595,
                 Point3::new(4.226588572714521, 3.9652493741284847, 1.2717075787012868),
                 Material::new_metal(
                     Point3::new(0.32780192965214, 0.5268124973052433, 0.6586297488042543),
                     0.8855721427753658,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.4919247444292507,
                 Point3::new(4.2310623391227224, 0.9513993109843566, 2.1971982472968925),
                 Material::new_lambertian(Point3::new(
@@ -946,23 +945,23 @@ pub fn benchmarking_scene() -> HitList {
                     0.038372552067592436,
                     0.11167846135219206,
                 )),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.31210627711582795,
                 Point3::new(4.091458770213643, 1.5008053579360237, 3.214029889690756),
                 Material::new_metal(
                     Point3::new(0.45889830489963757, 0.9823119531356224, 0.5926558143306689),
                     0.6216519586181387,
                 ),
-            )),
-            Box::new(Sphere::new(
+            ),
+            Hitable::new_sphere(
                 0.5628603039961712,
                 Point3::new(4.073737125610697, 2.9728210297716364, 4.016405153165205),
                 Material::new_metal(
                     Point3::new(0.8905166252363217, 0.6547641374017341, 0.6661260628043287),
                     0.735906704019969,
                 ),
-            )),
+            ),
         ],
     }
 }
