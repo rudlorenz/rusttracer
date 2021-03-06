@@ -1,5 +1,6 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
+use rusttracer::structs::bvh::BVH;
 use rusttracer::structs::vec3::Vec3;
 use rusttracer::structs::viewport::Viewport;
 
@@ -31,7 +32,7 @@ fn setup_and_run(samples: u32) -> Vec<u8> {
         img_height,
         samples,
         ray_depth,
-        rusttracer::benchmarking_scene(),
+        BVH::new(rusttracer::benchmarking_scene()),
     )
 }
 

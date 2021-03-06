@@ -1,9 +1,11 @@
+use crate::structs::aabb::AABB;
 use crate::structs::material::Material;
 use crate::structs::ray::Ray;
 use crate::structs::vec3::{Point3, Vec3};
 
-pub trait Hitable {
+pub trait Hitable: Sync + Send {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+    fn bounding_box(&self) -> Option<AABB>;
 }
 
 pub struct HitRecord {
@@ -35,7 +37,7 @@ impl HitRecord {
 }
 
 pub struct HitList {
-    pub elements: Vec<Box<dyn Hitable + Send + Sync>>,
+    pub elements: Vec<Box<dyn Hitable>>,
 }
 
 impl Hitable for HitList {
@@ -52,6 +54,23 @@ impl Hitable for HitList {
 
         last_hit
     }
+
+    fn bounding_box(&self) -> Option<AABB> {
+        if self.elements.is_empty() {
+            return None;
+        }
+
+        self.elements
+            .iter()
+            .try_fold(AABB::zero(), |mut acc, item| {
+                if let Some(bbox) = item.bounding_box() {
+                    acc.expand(bbox);
+                    Some(acc)
+                } else {
+                    None
+                }
+            })
+    }
 }
 
 impl HitList {
@@ -61,7 +80,7 @@ impl HitList {
         }
     }
 
-    pub fn push(&mut self, item: Box<dyn Hitable + Send + Sync>) {
+    pub fn push(&mut self, item: Box<dyn Hitable>) {
         self.elements.push(item);
     }
 

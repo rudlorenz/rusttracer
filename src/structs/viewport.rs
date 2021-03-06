@@ -1,4 +1,5 @@
-use crate::structs::hitable::{HitList, Hitable};
+use crate::structs::bvh::BVH;
+use crate::structs::hitable::Hitable;
 use crate::structs::ray::Ray;
 use crate::structs::vec3::{Point3, Vec3};
 
@@ -61,25 +62,25 @@ impl Viewport {
         )
     }
 
-    fn ray_col<R: Rng>(r: &Ray, scene: &HitList, rng: &mut R, depth: u32) -> Vec3 {
+    fn ray_col<R: Rng>(r: &Ray, scene: &BVH, rng: &mut R, depth: u32) -> Option<Vec3> {
         if depth != 0 {
             match scene.hit(r, 0.001, f64::MAX) {
                 Some(hit_rec) => {
                     if let Some(scatter_vec) = hit_rec.material.scatter(&r, &hit_rec, rng) {
-                        hit_rec.material.attenuation()
-                            * Viewport::ray_col(&scatter_vec, &scene, rng, depth - 1)
-                    } else {
-                        Vec3::new(0., 0., 0.)
+                        if let Some(ray_col) =
+                            Viewport::ray_col(&scatter_vec, &scene, rng, depth - 1)
+                        {
+                            return Some(hit_rec.material.attenuation() * ray_col);
+                        }
                     }
                 }
                 None => {
                     let t = 0.5 * (Vec3::unit_vector(r.direction()).y_ + 1.);
-                    (1. - t) * Vec3::new(1., 1., 1.) + t * Vec3::new(0.5, 0.7, 1.0)
+                    return Some((1. - t) * Vec3::new(1., 1., 1.) + t * Vec3::new(0.5, 0.7, 1.0));
                 }
             }
-        } else {
-            Vec3::new(0., 0., 0.)
         }
+        None
     }
 
     pub fn render(
@@ -88,7 +89,7 @@ impl Viewport {
         img_height: u32,
         samples: u32,
         ray_depth: u32,
-        scene: HitList,
+        scene: BVH,
     ) -> Vec<u8> {
         (0..img_height)
             .into_par_iter()
@@ -101,7 +102,9 @@ impl Viewport {
                         let u = (i as f64 + rng.gen::<f64>()) / img_width as f64;
                         let v = (j as f64 + rng.gen::<f64>()) / img_height as f64;
                         let r = self.send_ray(u, v, rng);
-                        col = col + Viewport::ray_col(&r, &scene, rng, ray_depth);
+                        if let Some(ray_col) = Viewport::ray_col(&r, &scene, rng, ray_depth) {
+                            col = col + ray_col;
+                        }
                     }
 
                     col = col / samples as f64;
